@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTheme } from "next-themes";
-import { MeshTransmissionMaterial, Float } from "@react-three/drei";
+import { Float } from "@react-three/drei";
 import * as THREE from "three";
 import { easing } from "maath";
 
@@ -25,9 +25,8 @@ export function FloatingObject() {
     roughness: 0.1,
     transmission: 1,
     ior: 1.2,
-    chromaticAberration: 0.04,
-    backside: true,
-    side: THREE.DoubleSide, // Keeps the single-sided math visible from all angles
+    transparent: true,
+    side: THREE.DoubleSide,
   };
 
   useFrame((state, delta) => {
@@ -48,18 +47,6 @@ export function FloatingObject() {
       groupRef.current.scale.setScalar(0.9);
       groupRef.current.position.x = 0;
       groupRef.current.position.y = 0;
-      
-      // Calculate mouse tilt
-      const targetRotationX = (state.pointer.y * Math.PI) / 6;
-      const targetRotationY = (state.pointer.x * Math.PI) / 6;
-
-      // Smoothly apply only the mouse tilt over the static Z orientation
-      easing.dampE(
-        groupRef.current.rotation,
-        [targetRotationX, targetRotationY, 0],
-        0.25,
-        delta
-      );
     }
   });
 
@@ -73,7 +60,7 @@ export function FloatingObject() {
       >
         <mesh ref={meshRef} scale={[1.6, 1, 1]}> {/* Skew scale on X-axis to securely elongate the shape */}
           <MobiusGeometry />
-          <MeshTransmissionMaterial ref={materialRef} {...materialProps} />
+          <meshPhysicalMaterial ref={materialRef} {...materialProps} />
         </mesh>
       </Float>
     </group>

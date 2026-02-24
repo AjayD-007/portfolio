@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { SmoothScrolling } from "@/components/SmoothScrolling";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import Scene from "@/components/Three/Scene";
@@ -52,12 +51,10 @@ export default function RootLayout({
           <Scene />
 
           <Header />
-          <SmoothScrolling>
-            <main className="flex flex-col min-h-screen pb-8">
-              {children}
-            </main>
-            <Footer />
-          </SmoothScrolling>
+          <main className="flex flex-col min-h-screen pb-8">
+            {children}
+          </main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

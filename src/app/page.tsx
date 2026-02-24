@@ -108,7 +108,7 @@ export default function Home() {
               
               <div className="grid grid-cols-1 gap-6 md:gap-8">
                 {resumeData.projects.list.map((proj, i) => (
-                  <GlassCard key={i} delay={0.1 * i} className="p-6 md:p-10 group hover:scale-[1.02] transition-transform duration-500">
+                  <GlassCard key={i} delay={0.1 * i} className="p-6 md:p-10 group">
                     <h3 className="text-xl md:text-2xl font-black mb-3 md:mb-4 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{proj.name}</h3>
                     <p className="text-gray-900 dark:text-gray-300 leading-relaxed font-medium text-base md:text-lg">
                       {proj.description}

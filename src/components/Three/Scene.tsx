@@ -85,6 +85,8 @@ export default function Scene() {
                 blur={2}
                 far={4}
                 color="#000000"
+                resolution={256}
+                frames={1} // Only render the shadow once since the object only rotates on Y axis!
               />
             )}
 
@@ -96,9 +98,6 @@ export default function Scene() {
                {/* Softbox highlights */}
                <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
                <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, -5, -9]} scale={[10, 10, 1]} />
-               
-               {/* The animated stars will now be captured by the Environment and refracted by the glass */}
-               <AnimatedStars />
             </Environment>
           </>
         )}
