@@ -21,11 +21,9 @@ export function FloatingObject() {
 
   // Material properties based on theme
   const materialProps = {
-    thickness: 0.2,
     roughness: 0.1,
-    transmission: 1,
-    ior: 1.2,
-    transparent: true,
+    metalness: 0.8,
+    envMapIntensity: 1.5,
     side: THREE.DoubleSide,
   };
 
@@ -60,7 +58,7 @@ export function FloatingObject() {
       >
         <mesh ref={meshRef} scale={[1.6, 1, 1]}> {/* Skew scale on X-axis to securely elongate the shape */}
           <MobiusGeometry />
-          <meshPhysicalMaterial ref={materialRef} {...materialProps} />
+          <meshStandardMaterial ref={materialRef} {...materialProps} />
         </mesh>
       </Float>
     </group>

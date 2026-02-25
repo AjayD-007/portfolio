@@ -62,7 +62,7 @@ export default function Scene() {
     <div className="fixed inset-0 -z-10 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        dpr={[1, 2]} // Support high pixel density
+        dpr={[1, 1.5]} // Capped pixel density to prevent extreme GPU overhead on 4k screens
       >
         <AnimatedBackground isDark={isDark} />
         

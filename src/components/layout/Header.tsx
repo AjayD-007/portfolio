@@ -13,7 +13,7 @@ export function Header() {
   ];
 
   return (
-    <header className="relative w-full z-50 px-4 md:px-6 pt-6 pb-2 mb-8 pointer-events-auto">
+    <header className="relative w-full z-50 px-4 md:px-6 pt-6 pointer-events-auto">
       <div className="container mx-auto max-w-7xl">
         <div className="flex items-center justify-between bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 p-4 rounded-2xl shadow-xl shadow-black/5">
           <div className="flex items-center gap-6 md:gap-8">

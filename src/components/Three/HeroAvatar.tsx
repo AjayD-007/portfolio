@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useTheme } from "next-themes";
@@ -56,10 +56,11 @@ void main() {
   float bottomFade = smoothstep(0.0, 0.3, vUv.y);
   float finalAlpha = baseTex.a * bottomFade;
 
-  // On touch devices without hover, just display the full color portrait immediately
+  // On touch devices without hover, display the pencil sketch
   if (uIsTouch > 0.5) {
+    vec3 touchColor = baseTex.rgb * uDarkBrightness;
     if (finalAlpha < 0.01) discard;
-    gl_FragColor = vec4(colorTex.rgb, finalAlpha);
+    gl_FragColor = vec4(touchColor, finalAlpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
     return;
@@ -189,8 +190,8 @@ export function HeroAvatarCanvas() {
   return (
     <div className="w-full h-full relative z-10 pointer-events-auto touch-pan-y">
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 45 }}
-        dpr={[1, 2]}
+        camera={{ position: [0, 0, 4.8], fov: 45 }}
+        dpr={[0.2, 1]}
       >
         <HeroAvatarShaderPlane />
       </Canvas>

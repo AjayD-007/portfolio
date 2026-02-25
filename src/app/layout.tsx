@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import Scene from "@/components/Three/Scene";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -47,9 +47,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Global persistent 3D WebGL background */}
-          <Scene />
-
           <Header />
           <main className="flex flex-col min-h-screen pb-8">
             {children}

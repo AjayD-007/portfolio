@@ -1,51 +1,48 @@
 import { resumeData } from "@/data/resume";
 import { GlassCard } from "@/components/GlassCard";
 import { HeroAvatarCanvas } from "@/components/Three/HeroAvatar";
+import Scene from "@/components/Three/Scene";
 
 export default function Home() {
   return (
     <div className="relative">
+      <Scene />
+      
       {/* Scrollable Content Container */}
-      <div className="relative container mx-auto px-4 sm:px-6 md:px-12 pb-24">
+      <div className="relative container mx-auto px-4 sm:px-6 md:px-12 pb-24 ">
         
         {/* Page 1: Hero */}
-        <section className="min-h-[100svh] w-full flex flex-col md:flex-row items-center justify-between relative pt-10 md:pt-0">
+        <section className="w-full flex flex-col md:flex-row items-center justify-between relative mb-24 md:mb-40">
           
-          <div className="z-10 w-full md:w-[50%] flex flex-col items-start mt-4 md:mt-0">
-            <div className="mb-6 md:mb-8 inline-block px-4 py-2 border border-black/10 dark:border-white/10 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md text-xs font-mono font-medium tracking-wider relative z-20">
-              {resumeData.availability}
-            </div>
-            
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-4 md:mb-6 uppercase leading-none">
+          {/* Text Content - Left Side */}
+          <div className="w-full md:w-3/4 flex flex-col items-start justify-center pt-8 md:pt-16 h-full">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-black tracking-tighter mb-4 uppercase leading-none drop-shadow-md text-center md:text-left w-full">
               {resumeData.title.split(" ")[0]}<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-500 dark:from-white dark:to-gray-500 break-words">
                 {resumeData.title.split(" ").slice(1).join(" ")}
               </span>
             </h1>
-            <p className="text-lg sm:text-xl md:text-3xl text-gray-900 dark:text-gray-400 font-medium max-w-2xl break-words text-balance">
-              {resumeData.subtitle}
-            </p>
+            <h2 className="text-xl md:text-2xl lg:text-3xl text-gray-800 dark:text-gray-300 font-semibold mb-6 capitalize text-center md:text-left w-full">
+{resumeData.availability.toUpperCase()}
+            </h2>
+            {/* Removed the pill tag and any extra skills text as requested */}
           </div>
 
-          {/* The Transparent Avatar Canvas embedded alongside the text */}
-          <div className="w-full md:w-[50%] h-[50vh] md:h-[80vh] relative z-20 flex items-center justify-center mt-8 md:mt-0">
-            <HeroAvatarCanvas />
+          {/* The Transparent Avatar Canvas embedded alongside the text - Right Side */}
+          <div className="w-full md:w-1/2 flex justify-center md:justify-end mt-2 md:mt-0 relative z-20">
+            <div className="w-full max-w-[400px] lg:max-w-[500px] aspect-[3/4] relative">
+              <HeroAvatarCanvas />
+            </div>
           </div>
 
         </section>
 
         {/* Narrative Portfolio Sections */}
-        <div className="relative z-20 w-full mx-auto flex flex-col gap-24 md:gap-48 mt-16 md:mt-24">
+        <div className="relative z-20 w-full mx-auto flex flex-col items-center gap-24 md:gap-40 mt-8 md:mt-16">
           
-          {/* About - Offset Left with Right Typography Filler */}
-          <section className="relative w-full flex items-center">
-            {/* Background Filler */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex flex-col items-end select-none pointer-events-none opacity-[0.03] dark:opacity-5 mix-blend-overlay">
-              <span className="text-[16rem] font-black leading-none tracking-tighter">01</span>
-              <span className="text-4xl font-bold tracking-[0.5em] uppercase mr-2">Origin</span>
-            </div>
-            
-            <div className="w-full md:w-[60%] z-10">
+          {/* About */}
+          <section className="relative w-full flex items-center justify-center">
+            <div className="w-full max-w-4xl z-10">
               <GlassCard delay={0.2} className="p-6 md:p-10">
                  <h2 className="text-3xl md:text-5xl font-black mb-4 md:mb-6">{resumeData.about.title}</h2>
                  <p className="text-lg md:text-2xl text-gray-900 dark:text-gray-300 leading-relaxed font-medium">
@@ -55,15 +52,9 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Experience - Offset Left with Right Typography Filler */}
-          <section className="relative w-full flex flex-col gap-4 md:gap-8">
-            {/* Background Filler */}
-            <div className="absolute right-4 top-1/4 hidden md:flex flex-col items-end select-none pointer-events-none opacity-[0.03] dark:opacity-5 mix-blend-overlay">
-              <span className="text-[20rem] font-black leading-none tracking-tighter">02</span>
-              <span className="text-5xl font-bold tracking-[0.5em] uppercase mr-4">Build</span>
-            </div>
-
-            <div className="w-full md:w-[65%] z-10">
+          {/* Experience */}
+          <section className="relative w-full flex flex-col items-center gap-4 md:gap-8">
+            <div className="w-full max-w-4xl z-10">
               <div className="mb-6 md:mb-8">
                 <h2 className="text-4xl md:text-6xl font-black drop-shadow-sm">{resumeData.experience.title}</h2>
               </div>
@@ -93,15 +84,9 @@ export default function Home() {
             </div>
           </section>
           
-          {/* Projects & Education - Offset Right with Left Typography Filler */}
-          <section className="relative w-full flex flex-col items-end gap-8 md:gap-12 z-10">
-            {/* Background Filler (Left aligned) */}
-            <div className="absolute left-0 top-1/4 hidden md:flex flex-col items-start select-none pointer-events-none opacity-[0.03] dark:opacity-5 mix-blend-overlay">
-              <span className="text-[20rem] font-black leading-none tracking-tighter">03</span>
-              <span className="text-5xl font-bold tracking-[0.5em] uppercase ml-4">Code</span>
-            </div>
-
-            <div className="w-full md:w-[65%]">
+          {/* Projects & Education */}
+          <section className="relative w-full flex flex-col items-center gap-8 md:gap-12 z-10">
+            <div className="w-full max-w-4xl">
               <div className="mb-4">
                 <h2 className="text-4xl md:text-6xl font-black drop-shadow-sm">{resumeData.projects.title}</h2>
               </div>
@@ -131,9 +116,9 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Contact - Centered Final Act */}
+          {/* Contact */}
           <section className="py-16 md:py-32 w-full flex justify-center z-10">
-             <GlassCard delay={0.2} className="text-center w-full max-w-3xl py-12 md:py-16 px-6 md:px-10">
+             <GlassCard delay={0.2} className="text-center w-full max-w-4xl py-12 md:py-16 px-6 md:px-10">
                 <h2 className="text-4xl md:text-7xl font-black mb-4 md:mb-8">{resumeData.contact.title}</h2>
                 <p className="text-lg md:text-2xl text-gray-900 dark:text-gray-400 mb-8 md:mb-12 font-medium">
                   {resumeData.contact.description}
