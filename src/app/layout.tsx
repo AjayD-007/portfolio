@@ -32,6 +32,9 @@ export const metadata: Metadata = {
     description: resumeData.about.description,
     type: "website",
   },
+  verification: {
+    google: 'Xh3XPizuK_wjlfTx9y4J-Dmdge3GBIj4fr5_rN6ZNUg',
+  },
 };
 
 export default function RootLayout({
