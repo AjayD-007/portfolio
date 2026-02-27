@@ -4,8 +4,24 @@ import { HeroAvatarCanvas } from "@/components/Three/HeroAvatar";
 import Scene from "@/components/Three/Scene";
 
 export default function Home() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: resumeData.title,
+    jobTitle: 'Software Engineer',
+    url: 'https://ajay-dharmaraj.vercel.app',
+    sameAs: [
+      resumeData.contact.links.linkedin,
+      resumeData.contact.links.github,
+    ]
+  };
+
   return (
     <div className="relative">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Scene />
       
       {/* Scrollable Content Container */}

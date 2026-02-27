@@ -1,5 +1,11 @@
 import { GlassCard } from "@/components/GlassCard";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Writings | Ajay - Frontend & Design",
+  description: "Thoughts, tutorials, and experiments exploring frontend engineering and design.",
+};
 
 // ----------------------------------------------------
 // UPDATE THIS TO YOUR DEV.TO USERNAME

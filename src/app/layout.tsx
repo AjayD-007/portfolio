@@ -9,16 +9,19 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 import { resumeData } from "@/data/resume";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://ajay-dharmaraj.vercel.app'),
   title: `${resumeData.title} | ${resumeData.subtitle}`,
   description: resumeData.about.description,
   keywords: ["Software Engineer", "Full Stack", "Portfolio", "WebGL", "Three.js", "React", "Next.js"],

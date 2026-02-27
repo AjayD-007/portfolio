@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GlassCard } from "@/components/GlassCard";
+import { Metadata, ResolvingMetadata } from "next";
 
 const DEV_TO_USERNAME = "ajay_dharmaraj";
 
@@ -27,6 +28,39 @@ async function getArticle(slug: string) {
   }
 }
 
+export async function generateMetadata(
+  { params }: { params: { slug: string } },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const parsedParams = await params;
+  const article = await getArticle(parsedParams.slug);
+
+  if (!article) return { title: 'Not Found' };
+
+  return {
+    title: `${article.title} | Ajay`,
+    description: article.description,
+    openGraph: {
+      title: article.title,
+      description: article.description,
+      type: 'article',
+      publishedTime: article.published_at,
+      authors: ['Ajay Dharmaraj'],
+      images: [
+        {
+          url: article.social_image || article.cover_image || 'https://ajay-dharmaraj.vercel.app/og-image.png',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.description,
+      images: [article.social_image || article.cover_image || 'https://ajay-dharmaraj.vercel.app/og-image.png'],
+    },
+  };
+}
+
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const parsedParams = await params;
   const article = await getArticle(parsedParams.slug);
@@ -35,8 +69,26 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     notFound();
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: article.title,
+    image: article.cover_image || article.social_image,
+    datePublished: article.published_at,
+    dateModified: article.published_at,
+    author: [{
+      '@type': 'Person',
+      name: 'Ajay Dharmaraj',
+      url: 'https://ajay-dharmaraj.vercel.app'
+    }]
+  };
+
   return (
     <article className="relative container mx-auto px-6 md:px-12 py-12 md:py-24 z-10 flex-grow max-w-4xl">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mb-12">
         <Link 
           href="/blogs" 

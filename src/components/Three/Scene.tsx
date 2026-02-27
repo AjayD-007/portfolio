@@ -4,7 +4,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, ContactShadows, Stars } from "@react-three/drei";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect, useState, Suspense } from "react";
 import * as THREE from "three";
 import { easing } from "maath";
 import { FloatingObject } from "./FloatingObject";
@@ -57,53 +57,63 @@ export default function Scene() {
   const isDark = theme === "dark" || resolvedTheme === "dark";
   const pathname = usePathname();
   const isHome = pathname === "/";
+  
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
-    <div className="fixed inset-0 -z-10 pointer-events-none">
+    <div className="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         dpr={[1, 1.5]} // Capped pixel density to prevent extreme GPU overhead on 4k screens
       >
-        <AnimatedBackground isDark={isDark} />
-        
-        {/* Conditional rendering of heavy 3D elements for performance */}
-        {isHome && (
-          <>
-            {/* Lights */}
-            <ambientLight intensity={isDark ? 0.2 : 0.8} />
-            <spotLight position={[10, 10, 10]} penumbra={1} angle={0.2} intensity={isDark ? 1 : 2} />
+        <Suspense fallback={null}>
+          <AnimatedBackground isDark={isDark} />
+          
+          {/* Conditional rendering of heavy 3D elements for performance */}
+          {isHome && (
+            <>
+              {/* Lights */}
+              <ambientLight intensity={isDark ? 0.2 : 0.8} />
+              <spotLight position={[10, 10, 10]} penumbra={1} angle={0.2} intensity={isDark ? 1 : 2} />
 
-            {/* Floating Object */}
-            <FloatingObject />
+              {/* Floating Object */}
+              <FloatingObject />
 
-            {/* Grounding Contact Shadows for Light Mode */}
-            {!isDark && (
-              <ContactShadows
-                position={[0, -2.5, 0]}
-                opacity={0.4}
-                scale={10}
-                blur={2}
-                far={4}
-                color="#000000"
-                resolution={256}
-                frames={1} // Only render the shadow once since the object only rotates on Y axis!
-              />
-            )}
+              {/* Grounding Contact Shadows for Light Mode */}
+              {!isDark && (
+                <ContactShadows
+                  position={[0, -2.5, 0]}
+                  opacity={0.4}
+                  scale={10}
+                  blur={2}
+                  far={4}
+                  color="#000000"
+                  resolution={256}
+                  frames={1} // Only render the shadow once since the object only rotates on Y axis!
+                />
+              )}
 
-            {/* Environment mapping for reflections */}
-            <Environment 
-              preset={isDark ? "night" : "studio"} 
-              background={false} // Don't render as a literal background, only use for reflection math
-            >
-               {/* Softbox highlights */}
-               <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
-               <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, -5, -9]} scale={[10, 10, 1]} />
-            </Environment>
-          </>
-        )}
+              {/* Environment mapping for reflections */}
+              <Environment 
+                preset={isDark ? "night" : "studio"} 
+                background={false} // Don't render as a literal background, only use for reflection math
+              >
+                 {/* Softbox highlights */}
+                 <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
+                 <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, -5, -9]} scale={[10, 10, 1]} />
+              </Environment>
+            </>
+          )}
 
-        {/* Render actual background stars globally everywhere (if dark mode) */}
-        {isDark && <AnimatedStars />}
+          {/* Render actual background stars globally everywhere (if dark mode) */}
+          {isDark && <AnimatedStars />}
+        </Suspense>
       </Canvas>
     </div>
   );

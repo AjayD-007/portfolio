@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useTheme } from "next-themes";
@@ -187,13 +187,29 @@ function HeroAvatarShaderPlane() {
 }
 
 export function HeroAvatarCanvas() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="w-full h-full relative z-10 pointer-events-auto flex items-center justify-center">
+        <div className="w-full h-full bg-black/5 dark:bg-white/5 animate-pulse rounded-[100px]" />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-full relative z-10 pointer-events-auto touch-pan-y">
+    <div className="w-full h-full relative z-10 pointer-events-auto touch-pan-y" aria-hidden="true">
       <Canvas
         camera={{ position: [0, 0, 4.8], fov: 45 }}
         dpr={[0.2, 1]}
       >
-        <HeroAvatarShaderPlane />
+        <Suspense fallback={null}>
+          <HeroAvatarShaderPlane />
+        </Suspense>
       </Canvas>
     </div>
   );
