@@ -20,7 +20,7 @@ export const revalidate = 3600;
 async function getPosts() {
   try {
     // We only fetch a minimal payload for the index page to stay fast
-    const res = await fetch(`https://dev.to/api/articles?username=${DEV_TO_USERNAME}`);
+    const res = await fetch(`https://dev.to/api/articles?username=${DEV_TO_USERNAME}&state=all`);
     if (!res.ok) return [];
     
     // The dev.to API returns an array of article objects

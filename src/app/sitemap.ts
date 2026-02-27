@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let blogUrls: MetadataRoute.Sitemap = [];
   
   try {
-    const res = await fetch(`https://dev.to/api/articles?username=${DEV_TO_USERNAME}`);
+    const res = await fetch(`https://dev.to/api/articles?username=${DEV_TO_USERNAME}&state=all`);
     if (res.ok) {
       const posts = await res.json();
       blogUrls = posts.map((post: any) => ({
