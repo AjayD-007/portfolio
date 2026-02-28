@@ -12,6 +12,8 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@types/three": "^0.182.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.36.3",
     "lucide-react": "^0.562.0",
     "maath": "^0.10.8",
     "next": "16.1.1",

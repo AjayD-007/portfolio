@@ -3,9 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useEffect, useState } from "react";
+import { Eye } from "lucide-react";
 
 export function Header() {
   const pathname = usePathname();
+  const [viewCount, setViewCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch('/api/views', { method: 'POST' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.views) setViewCount(data.views);
+      })
+      .catch((err) => console.error('Error fetching views:', err));
+  }, []);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -41,6 +53,15 @@ export function Header() {
           </div>
           
           <div className="flex items-center gap-4">
+            {viewCount !== null && (
+              <div
+                className="flex items-center gap-2 text-sm font-medium text-black dark:text-white bg-black/5 dark:bg-white/10 backdrop-blur-md px-3 md:px-4 py-2.5 md:py-3 rounded-full border border-black/10 dark:border-white/20 transition-all duration-500 animate-in fade-in zoom-in-95 hover:scale-105"
+                title="Unique Views"
+              >
+                <Eye size={20} />
+                <span>{viewCount.toLocaleString()}</span>
+              </div>
+            )}
             <ThemeToggle />
           </div>
         </div>
