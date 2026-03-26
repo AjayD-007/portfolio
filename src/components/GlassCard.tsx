@@ -11,7 +11,7 @@ interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
 export const GlassCard = ({ children, className = "", delay = 0, ...props }: GlassCardProps) => {
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-black/15 dark:border-white/10 bg-white/70 dark:bg-black/70 p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] dark:shadow-2xl ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-black/15 dark:border-white/10 bg-white/70 dark:bg-black/70 p-5 md:p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] dark:shadow-2xl ${className}`}
       {...props}
     >
       {/* Subtle inner glow */}
