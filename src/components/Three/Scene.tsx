@@ -2,12 +2,20 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, ContactShadows, Stars } from "@react-three/drei";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 import { useRef, useMemo, useEffect, useState, Suspense } from "react";
 import * as THREE from "three";
 import { easing } from "maath";
 import { FloatingObject } from "./FloatingObject";
+
+function SceneReady({ setReady }: { setReady: (v: boolean) => void }) {
+  useEffect(() => {
+    setReady(true);
+  }, [setReady]);
+  return null;
+}
 
 // Animated starfield for dynamic reflections
 function AnimatedStars() {
@@ -59,6 +67,7 @@ export default function Scene() {
   const isHome = pathname === "/";
   
   const [mounted, setMounted] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -67,20 +76,21 @@ export default function Scene() {
   if (!mounted) return null;
 
   return (
-    <div className="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">
+    <div className={`fixed inset-0 -z-10 pointer-events-none transition-opacity duration-1000 ease-in-out ${ready ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         dpr={[1, 1.5]} // Capped pixel density to prevent extreme GPU overhead on 4k screens
       >
         <Suspense fallback={null}>
+          <SceneReady setReady={setReady} />
           <AnimatedBackground isDark={isDark} />
           
           {/* Conditional rendering of heavy 3D elements for performance */}
           {isHome && (
             <>
               {/* Lights */}
-              <ambientLight intensity={isDark ? 0.2 : 0.8} />
-              <spotLight position={[10, 10, 10]} penumbra={1} angle={0.2} intensity={isDark ? 1 : 2} />
+              <ambientLight intensity={isDark ? 0.2 : 0.6} />
+              <spotLight position={[10, 10, 10]} penumbra={1} angle={0.2} intensity={isDark ? 1 : 0.5} />
 
               {/* Floating Object */}
               <FloatingObject />
@@ -113,6 +123,12 @@ export default function Scene() {
 
           {/* Render actual background stars globally everywhere (if dark mode) */}
           {isDark && <AnimatedStars />}
+          
+          {/* True 2D Bloom Post-Processing to create the physical TRON halo effect */}
+          {/* Disabled multisampling to massively optimize mobile and laptop GPU bounds */}
+          <EffectComposer  multisampling={0}>
+            <Bloom luminanceThreshold={2.0} mipmapBlur intensity={1.5} />
+          </EffectComposer>
         </Suspense>
       </Canvas>
     </div>

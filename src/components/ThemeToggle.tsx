@@ -14,7 +14,15 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return null;
+    return (
+      <button
+        className="relative p-2.5 md:p-3 rounded-full bg-black/5 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/20 text-transparent transition-all"
+        aria-hidden="true"
+        disabled
+      >
+        <div className="w-[20px] h-[20px]" />
+      </button>
+    );
   }
 
   return (

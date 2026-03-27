@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTheme } from "next-themes";
 import { Float } from "@react-three/drei";
@@ -22,10 +22,24 @@ export function FloatingObject() {
   const uniformsRef = useRef({
     uScroll: { value: -0.1 },
     uColorBase: { value: new THREE.Color(0x000000) },
-    uColorActive: { value: new THREE.Color("#b91c1c") }, // Blood Red
+    uColorActive: { value: new THREE.Color("#ff0000") }, // Pure Neon Red (0 Green, 0 Blue prevents white clipping)
   });
 
-  const targetColorRef = useRef(new THREE.Color("#b91c1c")); // Blood Red
+  const targetColorRef = useRef(new THREE.Color("#ff0000"));
+
+  // Cache maxScroll to completely eliminate browser Layout Thrashing in the render loop
+  const maxScrollRef = useRef(1);
+
+  useEffect(() => {
+    const updateMaxScroll = () => {
+      maxScrollRef.current = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    };
+    
+    // Calculate exactly once on mount, then recalculate only if physical viewport dimensions change
+    updateMaxScroll();
+    window.addEventListener("resize", updateMaxScroll);
+    return () => window.removeEventListener("resize", updateMaxScroll);
+  }, []);
 
   // Setup sweeping emissive custom shader
   const materialProps = useMemo(() => ({
@@ -74,20 +88,25 @@ export function FloatingObject() {
         float renderSideOffset = gl_FrontFacing ? 0.0 : 1.0;
         float continuousX = vUvLocal.x + renderSideOffset;
         
-        // Sweep mask now evaluates against the 0.0 to 2.0 unrolled domain
-        float fill = smoothstep(uScroll + 0.02, uScroll - 0.02, continuousX);
+        // Calculate circular distance from the visual "front center" (0.5)
+        float diff = abs(continuousX - 0.5);
+        float distFromStart = min(diff, 2.0 - diff);
         
-        // Perfectly straight line in the exact center (0.5) of the geometry
+        // Sweep mask expands outwards from the start point in TWO directions simultaneously!
+        float fill = smoothstep(uScroll + 0.03, uScroll - 0.03, distFromStart);
+        
+        // Perfectly straight line in the exact center (0.5) of the geometry width
         float centerDist = abs(vUvLocal.y - 0.5);
         
-        // Razor thin glow falloff
-        float lineGlow = smoothstep(0.012, 0.002, centerDist);
+        // Removed the fake soft halo completely. This is now a razor-thin, solid laser line.
+        // We will rely on literal React Post-Processing Bloom to create the TRON glow.
+        float lineGlow = smoothstep(0.010, 0.008, centerDist);
 
-        // Apply sweep mask so the TRON line traces permanently behind the scroll
+        // Apply sweep mask
         float finalGlow = lineGlow * fill;
         
-        // Mega-boost the intensity of the pure center line
-        totalEmissiveRadiance += mix(uColorBase, uColorActive, finalGlow) * 6.0;
+        // Pump the engine multiplier massive to 10.0 since Bloom threshold will catch it
+        totalEmissiveRadiance += mix(uColorBase, uColorActive, finalGlow) * 10.0;
         `
       );
     }
@@ -102,32 +121,39 @@ export function FloatingObject() {
     if (materialRef.current) {
         const isDark = theme === "dark" || resolvedTheme === "dark";
 
-        // Dynamic Metalness & Roughness (matte in Light Mode, slightly metallic in Dark Mode)
-        const targetMetalness = isDark ? 0.8 : 0.0;
-        const targetRoughness = isDark ? 0.2 : 0.9; // Increased roughness to blur harsh light
+        // Dynamic material parameters (matte in Light Mode, slightly metallic in Dark Mode)
+        const targetMetalness = isDark ? 0 : 0.0;
+        const targetRoughness = isDark ? 1 : 1.0; 
+        const targetEnvMap = isDark ? 0.0 : 0.0; // Completely cuts all reflections in light mode
+        
         easing.damp(materialRef.current, 'metalness', targetMetalness, 0.25, delta);
         easing.damp(materialRef.current, 'roughness', targetRoughness, 0.25, delta);
+        easing.damp(materialRef.current, 'envMapIntensity', targetEnvMap, 0.25, delta);
 
         // Smoothly interpolate material color based on theme
-        const targetColor = isDark ? new THREE.Color("#282727ff") : new THREE.Color("#d4d3d3ff");
+        // In Light Mode, use a deep matte grey (#3f3f46) so the object contrasts against the white page
+        // and doesn't blow out or become invisible under the scene lights.
+        const targetColor = isDark ? new THREE.Color("#3f3f46") : new THREE.Color("#868689");
         easing.dampC(materialRef.current.color, targetColor, 0.25, delta);
 
         // --- NEW: Sweeping scroll-driven emissive shader ---
         const scrollY = window.scrollY;
-        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        
+        // Grab cached un-thrashed document layout value
+        const maxScroll = maxScrollRef.current;
         
         // Map scroll to a 0.0 to 1.0 progress curve
         const progress = Math.max(0, Math.min(1, scrollY / maxScroll));
         
-        // Map progress across a full 720 degree loop (0 to 2.1)
-        // It starts off-strip (-0.1), traces the front face to 1.0, and traces the back face to 2.0.
-        const mappedScroll = -0.1 + (progress * 2.2);
+        // Map progress from -0.1 to 1.1 to drive the bidirectional expansion
+        // Because max circular distance on the 2.0 domain is 1.0, this completely encircles the strip
+        const mappedScroll = -0.1 + (progress * 1.2);
         
         // Smoothly advance the swept uScroll uniform
         easing.damp(uniformsRef.current.uScroll, 'value', mappedScroll, 0.25, delta);
         
-        // Consistent Blood Red color for both themes
-        const activeColor = new THREE.Color("#b91c1c");
+        // Consistent pure red color for both themes to avoid white clipping
+        const activeColor = new THREE.Color("#ff0000");
         easing.dampC(targetColorRef.current, activeColor, 0.25, delta);
         uniformsRef.current.uColorActive.value.copy(targetColorRef.current);
     }

@@ -186,31 +186,34 @@ function HeroAvatarShaderPlane() {
   );
 }
 
+function SceneReady({ setReady }: { setReady: (v: boolean) => void }) {
+  useEffect(() => {
+    setReady(true);
+  }, [setReady]);
+  return null;
+}
+
 export function HeroAvatarCanvas() {
   const [mounted, setMounted] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return (
-      <div className="w-full h-full relative z-10 pointer-events-auto flex items-center justify-center">
-        <div className="w-full h-full bg-black/5 dark:bg-white/5 animate-pulse rounded-[100px]" />
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-full relative z-10 pointer-events-auto touch-pan-y" aria-hidden="true">
-      <Canvas
-        camera={{ position: [0, 0, 4.8], fov: 45 }}
-        dpr={[0.2, 1]}
-      >
-        <Suspense fallback={null}>
-          <HeroAvatarShaderPlane />
-        </Suspense>
-      </Canvas>
+    <div className={`w-full h-full relative z-10 pointer-events-auto touch-pan-y transition-opacity duration-1000 ease-in-out ${ready ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true">
+      {mounted && (
+        <Canvas
+          camera={{ position: [0, 0, 4.8], fov: 45 }}
+          dpr={[0.2, 1]}
+        >
+          <Suspense fallback={null}>
+            <SceneReady setReady={setReady} />
+            <HeroAvatarShaderPlane />
+          </Suspense>
+        </Canvas>
+      )}
     </div>
   );
 }

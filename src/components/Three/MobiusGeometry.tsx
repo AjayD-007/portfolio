@@ -22,7 +22,7 @@ function mobiusStrip(u: number, v: number, target:any) {
   // 2. Revert to 1 half-twist so the classic Mobius identity is clearly visible,
   // but add an angle offset (Math.PI / 2) to force the strip to twist more dramatically 
   // relative to the saddle curves.
-  const twistAngle = (uRad / 2) + Math.PI / 2;
+  const twistAngle = (uRad / 2) + Math.PI / 1.5;
 
   const x = Math.cos(uRad) * (radius + vScale * width * Math.cos(twistAngle));
   const y = Math.sin(uRad) * (radius + vScale * width * Math.cos(twistAngle));
@@ -34,8 +34,8 @@ function mobiusStrip(u: number, v: number, target:any) {
 export function MobiusGeometry() {
   // useMemo ensures we only calculate the complex geometry once
   const geometry = useMemo(() => {
-    // 250 segments around, 40 segments across for complex intricate twists
-    return new ParametricGeometry(mobiusStrip, 250, 40);
+    // 150 segments around, 20 segments across for optimized performance (Approx 3,000 vertices, massively cheaper)
+    return new ParametricGeometry(mobiusStrip, 150, 20);
   }, []);
 
   return <primitive object={geometry} attach="geometry" />;

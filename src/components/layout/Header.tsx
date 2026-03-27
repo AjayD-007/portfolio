@@ -53,13 +53,21 @@ export function Header() {
           </div>
           
           <div className="flex items-center gap-4">
-            {viewCount !== null && (
+            {viewCount !== null ? (
               <div
                 className="flex items-center gap-2 text-sm font-medium text-black dark:text-white bg-black/5 dark:bg-white/10 backdrop-blur-md px-3 md:px-4 py-2.5 md:py-3 rounded-full border border-black/10 dark:border-white/20 transition-all duration-500 animate-in fade-in zoom-in-95 hover:scale-105"
                 title="Unique Views"
               >
                 <Eye size={20} />
                 <span>{viewCount.toLocaleString()}</span>
+              </div>
+            ) : (
+               <div
+                className="flex items-center gap-2 text-sm font-medium text-black/20 dark:text-white/20 bg-black/5 dark:bg-white/10 backdrop-blur-md px-3 md:px-4 py-2.5 md:py-3 rounded-full border border-black/10 dark:border-white/20 animate-pulse"
+                aria-hidden="true"
+              >
+                <Eye size={20} />
+                <span className="opacity-0">0,000</span>
               </div>
             )}
             <ThemeToggle />
