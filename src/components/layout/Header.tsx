@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useEffect, useState } from "react";
@@ -19,9 +20,14 @@ export function Header() {
       .catch((err) => console.error('Error fetching views:', err));
   }, []);
 
+  if (pathname === '/math/non-euclidean-world') {
+    return null;
+  }
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Blogs", href: "/blogs" },
+    { name: "Math", href: "/math" },
   ];
 
   return (
@@ -29,11 +35,8 @@ export function Header() {
       <div className="container mx-auto max-w-7xl">
         <div className="flex items-center justify-between bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 p-4 rounded-2xl shadow-xl shadow-black/5">
           <div className="flex items-center gap-6 md:gap-8">
-            <Link 
-              href="/" 
-              className="text-xl md:text-2xl font-black tracking-tighter"
-            >
-              AD
+            <Link href="/" className="block">
+              <Image src="/logo.png" alt="AD Logo" width={40} height={40} className="rounded-lg" priority />
             </Link>
             <nav className="flex items-center gap-4 md:gap-6">
               {navLinks.map((link) => (

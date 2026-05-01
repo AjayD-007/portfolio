@@ -27,6 +27,10 @@ export const metadata: Metadata = {
   keywords: ["Software Engineer", "Full Stack", "Portfolio", "WebGL", "Three.js", "React", "Next.js"],
   authors: [{ name: resumeData.title }],
   creator: resumeData.title,
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: `${resumeData.title} | ${resumeData.subtitle}`,
     description: resumeData.about.description,

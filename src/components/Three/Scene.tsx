@@ -80,6 +80,7 @@ export default function Scene() {
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         dpr={[1, 1.5]} // Capped pixel density to prevent extreme GPU overhead on 4k screens
+        gl={{ localClippingEnabled: true }}
       >
         <Suspense fallback={null}>
           <SceneReady setReady={setReady} />
