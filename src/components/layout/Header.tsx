@@ -20,7 +20,7 @@ export function Header() {
       .catch((err) => console.error('Error fetching views:', err));
   }, []);
 
-  if (pathname === '/math/non-euclidean-world') {
+  if (pathname === '/math/non-euclidean-world' || pathname === '/math/fractals') {
     return null;
   }
 
