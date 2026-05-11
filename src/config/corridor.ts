@@ -1,7 +1,7 @@
 export const CORRIDOR = {
   geometry: {
     // Length of a single continuous segment. 
-    L: 12, 
+    L: 10, 
     // Physical aspect ratio of the corridor
     W: 3.5, // Width 
     H: 4.5, // Height

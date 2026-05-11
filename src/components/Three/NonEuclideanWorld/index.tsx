@@ -12,6 +12,7 @@ import { Painting } from "./Painting";
 export function NonEuclideanWorld({ scrollDelta }: { scrollDelta: number }) {
   const currentOffset = useRef(0);
   const { L, W, H, numSegments } = CORRIDOR.geometry;
+  const nearWallLength = L - 4;
   
   const paintingTexture = useTexture('/textures/painting.png');
   
@@ -46,7 +47,7 @@ export function NonEuclideanWorld({ scrollDelta }: { scrollDelta: number }) {
      applyRepeat(floorTex, 6, 18);    
   }, [plaster, wood, floorTex]);
 
-  const clipPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 0, 1), 20), []);
+  const clipPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 0, 1), L + nearWallLength), [L, nearWallLength]);
   const spotLightRef = useRef<THREE.SpotLight>(null);
   const targetRef = useRef<THREE.Object3D>(null);
 
@@ -101,44 +102,44 @@ export function NonEuclideanWorld({ scrollDelta }: { scrollDelta: number }) {
         </mesh>
         
         {/* Turn Floor */}
-        <mesh position={[W * 2, 0, -10]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={[W * 2, 0, -(L - 2)]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[W * 3, 4]} />
           <meshStandardMaterial {...floorTex} />
         </mesh>
         {/* Turn Ceiling */}
-        <mesh position={[W * 2, H, -10]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[W * 2, H, -(L - 2)]} rotation={[Math.PI / 2, 0, 0]}>
           <planeGeometry args={[W * 3, 4]} />
           <meshStandardMaterial color={CORRIDOR.colors.ceiling} roughness={1} />
         </mesh>
 
         {/* Turn Front Wall (facing camera) */}
-        <mesh position={[W * 2, H/2, -8]}>
+        <mesh position={[W * 2, H/2, -nearWallLength]}>
             <planeGeometry args={[W * 3, H]} />
             <meshStandardMaterial {...plaster} roughness={1.5} normalScale={new THREE.Vector2(1.5, 1.5)} />
         </mesh>
         {/* Turn Front Wall Crown Molding */}
-        <mesh position={[W * 3.5, H, -8]} rotation={[0, -Math.PI/2, 0]}>
+        <mesh position={[W * 3.5, H, -nearWallLength]} rotation={[0, -Math.PI/2, 0]}>
           <extrudeGeometry args={[crownShape, { depth: W * 3, bevelEnabled: false, curveSegments: 12 }]} />
           <meshStandardMaterial {...plaster} color={CORRIDOR.colors.ceiling} roughness={0.7} />
         </mesh>
         {/* Turn Front Wall Baseboard */}
-        <mesh position={[W * 3.5, 0, -8]} rotation={[0, -Math.PI/2, 0]}>
+        <mesh position={[W * 3.5, 0, -nearWallLength]} rotation={[0, -Math.PI/2, 0]}>
           <extrudeGeometry args={[baseboardShape, { depth: W * 3, bevelEnabled: false, curveSegments: 12 }]} />
           <meshStandardMaterial {...plaster} color={CORRIDOR.colors.ceiling} roughness={0.7} />
         </mesh>
 
         {/* Turn Rightmost Wall */}
-        <mesh position={[W * 3.5, H/2, -10]} rotation={[0, -Math.PI/2, 0]}>
+        <mesh position={[W * 3.5, H/2, -(L - 2)]} rotation={[0, -Math.PI/2, 0]}>
             <planeGeometry args={[4, H]} />
             <meshStandardMaterial {...plaster} roughness={1.5} normalScale={new THREE.Vector2(1.5, 1.5)} />
         </mesh>
         {/* Turn Rightmost Crown Molding */}
-        <mesh position={[W * 3.5, H, -12]}>
+        <mesh position={[W * 3.5, H, -L]}>
           <extrudeGeometry args={[require('./Shapes').rightCrownShape, { depth: 4, bevelEnabled: false, curveSegments: 12 }]} />
           <meshStandardMaterial {...plaster} color={CORRIDOR.colors.ceiling} roughness={0.7} />
         </mesh>
         {/* Turn Rightmost Baseboard */}
-        <mesh position={[W * 3.5, 0, -12]}>
+        <mesh position={[W * 3.5, 0, -L]}>
           <extrudeGeometry args={[require('./Shapes').rightBaseboardShape, { depth: 4, bevelEnabled: false, curveSegments: 12 }]} />
           <meshStandardMaterial {...plaster} color={CORRIDOR.colors.ceiling} roughness={0.7} />
         </mesh>
@@ -146,7 +147,7 @@ export function NonEuclideanWorld({ scrollDelta }: { scrollDelta: number }) {
         {/* Diagonal Streetlight from right corner */}
         <spotLight 
            ref={spotLightRef}
-           position={[W/2 + 2.5, H + 4.2, -10.5]} 
+           position={[W/2 + 2.5, H + 4.2, -(L - 1.5)]} 
            intensity={300} 
            angle={Math.PI / 8} 
            penumbra={1} 
@@ -154,7 +155,7 @@ export function NonEuclideanWorld({ scrollDelta }: { scrollDelta: number }) {
            decay={2} 
            color="#ffff" 
         />
-        <object3D ref={targetRef} position={[W/4, 0, -11.5]} />
+        <object3D ref={targetRef} position={[W/4, 0, -(L - 0.5)]} />
         
         <mesh position={[0, 0, -L/2]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[W, L]} />
@@ -167,11 +168,17 @@ export function NonEuclideanWorld({ scrollDelta }: { scrollDelta: number }) {
         
         <HollowLeftWall plaster={plaster} wood={wood} />
 
-        {/* Static end-cap right wall — reaches precisely to the turn room gap at world Z=-20 */}
-        {/* Near panel: local Z=0 to -8 (world -12 to -20) */}
-        <mesh position={[W/2 + 0.01, H/2, -4]} rotation={[0, -Math.PI / 2, 0]}>
-            <planeGeometry args={[8, H]} />
+        {/* Static end-cap right wall — reaches precisely to the turn room gap */}
+        {/* Near panel: local Z=0 to -nearWallLength */}
+        <mesh position={[W/2 + 0.01, H/2, -nearWallLength/2]} rotation={[0, -Math.PI / 2, 0]}>
+            <planeGeometry args={[nearWallLength, H]} />
             <meshStandardMaterial {...plaster} roughness={1.5} normalScale={new THREE.Vector2(1.5, 1.5)} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+        </mesh>
+
+        {/* Static Right wall Crown Molding — always there (non-fading, requested) */}
+        <mesh position={[W/2, H, -nearWallLength]}>
+           <extrudeGeometry args={[require('./Shapes').rightCrownShape, { depth: nearWallLength, bevelEnabled: false, curveSegments: 12 }]} />
+           <meshStandardMaterial {...plaster} color={CORRIDOR.colors.ceiling} roughness={0.7} />
         </mesh>
         {/* GAP: local Z=-8 to -12 (world -20 to -24) — moving walls clipped here, corner room perfectly revealed */}
         {/* No far panel needed: the turn room extends entirely to the back wall at Z=-24 */}

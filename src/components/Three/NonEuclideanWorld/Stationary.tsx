@@ -7,6 +7,7 @@ import { Painting } from "./Painting";
 
 export function FadingStationaryProps({ currentOffset, numSegments, wood, paintingTexture, plaster }: any) {
   const { L, H } = CORRIDOR.geometry;
+  const nearWallLength = L - 4;
   const ceiliMatRef = useRef<THREE.MeshStandardMaterial>(null);
   const pointLightRef = useRef<THREE.PointLight>(null);
   const propsGroupRef = useRef<THREE.Group>(null);
@@ -47,8 +48,8 @@ export function FadingStationaryProps({ currentOffset, numSegments, wood, painti
 
         let flicker = 1;
         if (cycleIndex === 1) { 
-           let t = state.clock.elapsedTime;
-           flicker = 0.8 + 0.2 * (Math.sin(t * 10) * Math.sin(t * 3.3) * Math.cos(t * 17));
+            let t = state.clock.elapsedTime;
+            flicker = 0.8 + 0.2 * (Math.sin(t * 10) * Math.sin(t * 3.3) * Math.cos(t * 17));
         }
         if (pointLightRef.current) pointLightRef.current.intensity = opacity * CORRIDOR.lights.ceilingIntensity * flicker; 
         if (ceiliMatRef.current) ceiliMatRef.current.emissiveIntensity = 3 * flicker;
@@ -61,15 +62,9 @@ export function FadingStationaryProps({ currentOffset, numSegments, wood, painti
          <RecessedDoorAssembly wood={wood} cycleIndex={0} textRef={textRef} />
          <Painting cycleIndex={0} paintingTexture={paintingTexture} />
          
-         {/* Fading Right Crown Molding to hide segment pop-in */}
-         <mesh position={[CORRIDOR.geometry.W/2, CORRIDOR.geometry.H, -8]}>
-             <extrudeGeometry args={[require('./Shapes').rightCrownShape, { depth: 8, bevelEnabled: false, curveSegments: 12 }]} />
-             <meshStandardMaterial {...plaster} color={CORRIDOR.colors.ceiling} roughness={0.7} />
-         </mesh>
-         
-         {/* Fading Right Baseboard to hide segment pop-in */}
-         <mesh position={[CORRIDOR.geometry.W/2, 0, -8]}>
-             <extrudeGeometry args={[require('./Shapes').rightBaseboardShape, { depth: 8, bevelEnabled: false, curveSegments: 12 }]} />
+         {/* Fading Right Baseboard to hide segment pop-in (length scales with L) */}
+         <mesh position={[CORRIDOR.geometry.W/2, 0, -nearWallLength]}>
+             <extrudeGeometry args={[require('./Shapes').rightBaseboardShape, { depth: nearWallLength, bevelEnabled: false, curveSegments: 12 }]} />
              <meshStandardMaterial {...plaster} color={CORRIDOR.colors.ceiling} roughness={0.7} />
          </mesh>
       </group>
