@@ -20,9 +20,7 @@ export function Header() {
       .catch((err) => console.error('Error fetching views:', err));
   }, []);
 
-  if (pathname === '/math/non-euclidean-world' || pathname === '/math/fractals') {
-    return null;
-  }
+  const isImmersivePage = pathname === '/math/non-euclidean-world' || pathname === '/math/fractals';
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -31,7 +29,7 @@ export function Header() {
   ];
 
   return (
-    <header className="relative w-full z-50 px-4 md:px-6 pt-6 pointer-events-auto">
+    <header className={`w-full z-50 px-4 md:px-6 pt-6 pointer-events-auto ${isImmersivePage ? 'fixed top-0 left-0' : 'relative'}`}>
       <div className="container mx-auto max-w-7xl">
         <div className="flex items-center justify-between bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 p-4 rounded-2xl shadow-xl shadow-black/5">
           <div className="flex items-center gap-6 md:gap-8">

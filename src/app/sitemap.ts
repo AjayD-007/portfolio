@@ -23,6 +23,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Error fetching Dev.to articles for sitemap:", error);
   }
 
+  const mathRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/math`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/math/fractals`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/math/fractals/learn`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/math/non-euclidean-world`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/math/non-euclidean-world/learn`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    }
+  ];
+
   return [
     {
       url: baseUrl,
@@ -36,6 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    ...mathRoutes,
     ...blogUrls,
   ]
 }
