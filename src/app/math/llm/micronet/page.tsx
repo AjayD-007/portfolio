@@ -1,17 +1,17 @@
 import { Metadata } from 'next';
-import { RNNExperiment } from '@/components/experiments/RNNExperiment';
+import { MicroNetExperiment } from '@/components/experiments/MicroNetExperiment';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Micro Language Model (RNN) | AjayD',
-  description: 'An interactive character-level Recurrent Neural Network built from scratch in TypeScript.',
+  title: 'Micro-Neural Network | AjayD',
+  description: 'An interactive, fully client-side neural network built from scratch in TypeScript.',
 };
 
-export default function RNNPage() {
+export default function MicroNetPage() {
   return (
     <main className="min-h-screen pt-4 pb-16 px-4 md:px-6">
-      <div className="container mx-auto max-w-5xl">
+      <div className="container mx-auto">
         <div className="mb-8">
           <Link 
             href="/math" 
@@ -21,15 +21,14 @@ export default function RNNPage() {
           </Link>
           
           <h1 className="text-3xl sm:text-4xl font-black tracking-tighter text-black dark:text-white mb-2">
-            Micro Language Model
+            Micro-Neural Network
           </h1>
           <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl font-medium">
-            A character-level Recurrent Neural Network (RNN) built entirely from scratch in TypeScript. 
-            No external libraries. Math runs in a Web Worker to prevent UI lag. Watch it learn the statistical distribution of characters in real-time.
+            A purely local, from-scratch Multi-Layer Perceptron (MLP) trained to predict the next character in a sequence. Watch the connections adapt and loss drop in real-time.
           </p>
         </div>
 
-        <RNNExperiment />
+        <MicroNetExperiment />
       </div>
     </main>
   );

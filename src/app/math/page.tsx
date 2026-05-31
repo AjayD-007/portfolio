@@ -43,7 +43,7 @@ export default function MathHubPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <main className="min-h-screen pt-2 md:pt-4 pb-8 md:pb-16 px-4 md:px-6">
-      <div className="container mx-auto max-w-5xl">
+      <div className="container mx-auto ">
         <div className="flex flex-col gap-3 md:gap-4 mb-10 md:mb-16">
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-500 dark:from-white dark:via-gray-200 dark:to-gray-500">
             Experiments
@@ -117,28 +117,28 @@ export default function MathHubPage() {
             </GlassCard>
           </Link>
 
-          {/* RNN Micro LLM */}
-          <Link href="/math/llm/rnn" className="group h-full block">
+          {/* Micro-Neural Network */}
+          <Link href="/math/llm/micronet" className="group h-full block">
             <GlassCard className="h-full flex flex-col justify-between transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-white/5 cursor-pointer border border-transparent hover:border-black/10 dark:hover:border-white/10">
               
               <div className="w-full aspect-video rounded-xl overflow-hidden mb-6 relative bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 flex items-center justify-center font-mono text-xs overflow-hidden">
                 <div className="absolute inset-0 opacity-10 dark:opacity-5 whitespace-pre-wrap p-2 leading-tight break-all">
-                  {"Wxh = randn(H, V)\nWhh = randn(H, H)\nWhy = randn(V, H)\nbh  = zeros(H, 1)\nby  = zeros(V, 1)\nh = Math.tanh(dot(Wxh, x) + dot(Whh, h_prev) + bh)\ny = dot(Why, h) + by\np = exp(y) / sum(exp(y))"}
+                  {"z1 = dot(W1, x) + b1\na1 = relu(z1)\nz2 = dot(W2, a1) + b2\na2 = softmax(z2)\nloss = -log(a2[target])"}
                 </div>
                 <div className="relative z-10 font-black text-4xl tracking-tighter text-black/40 dark:text-white/40 drop-shadow-md">
-                  RNN
+                  MLP
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <h2 className="text-xl font-bold tracking-tight text-black dark:text-white group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
-                    Micro Language Model
+                    Micro-Neural Network
                   </h2>
                   <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 duration-300" />
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">
-                  An interactive, character-level Recurrent Neural Network built entirely from scratch in TypeScript. Train it live in the browser.
+                  An interactive, fully client-side Multi-Layer Perceptron built from scratch. Watch the network connections adapt and shift in real-time as it learns a text corpus.
                 </p>
               </div>
               
