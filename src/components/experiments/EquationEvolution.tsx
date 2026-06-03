@@ -4,7 +4,7 @@ import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import {
   Play, Pause, RotateCcw, Dna, Zap,
   TrendingDown, Hash, FlaskConical, SlidersHorizontal,
-  FileText, Trash2
+  FileText, Trash2, Copy, Check, Maximize, History
 } from 'lucide-react';
 import {
   type ASTNode, type DataPoint, type Individual,
@@ -12,7 +12,7 @@ import {
   evaluateAST, astToString,
   generateNoisyQuadratic, generateNoisySine, generateNoisyLinear,
   dataToCSV, parseCSV,
-} from '@/lib/equationEvolver';
+} from './equation-evolver/equationEvolver';
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -75,6 +75,10 @@ export function EquationEvolution() {
   const [isAdapting, setIsAdapting] = useState(false);
   const [activePreset, setActivePreset] = useState<string | null>('quad');
   const [uploadError, setUploadError] = useState(false);
+  const [isExtrapolating, setIsExtrapolating] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyMilestones, setHistoryMilestones] = useState<{gen: number; mse: number; eq: string}[]>([]);
 
   // ── Refs ───────────────────────────────────────────────────
 
@@ -93,6 +97,10 @@ export function EquationEvolution() {
   const stagnationCounterRef = useRef(0);
   const adaptiveMutationCounterRef = useRef(0);
 
+  // History refs
+  const historyMilestonesRef = useRef<{gen: number; mse: number; eq: string}[]>([]);
+  const lastMilestoneMSERef = useRef<number>(Infinity);
+
   // ── Derived state ──────────────────────────────────────────
 
   const parsedData = useMemo<DataPoint[]>(() => parseCSV(rawInput), [rawInput]);
@@ -106,11 +114,21 @@ export function EquationEvolution() {
       if (p.y < yMin) yMin = p.y;
       if (p.y > yMax) yMax = p.y;
     }
-    const xPad = (xMax - xMin) * 0.12 || 1;
+    const xRange = xMax - xMin || 1;
+    const xPad = xRange * 0.12;
     const yPad = (yMax - yMin) * 0.12 || 1;
+
+    let finalXMin = xMin - xPad;
+    let finalXMax = xMax + xPad;
+
+    if (isExtrapolating) {
+      finalXMin -= xRange * 0.5;
+      finalXMax += xRange * 0.5;
+    }
+
     return {
-      xMin: xMin - xPad,
-      xMax: xMax + xPad,
+      xMin: finalXMin,
+      xMax: finalXMax,
       yMin: yMin - yPad,
       yMax: yMax + yPad,
     };
@@ -321,6 +339,9 @@ export function EquationEvolution() {
     lastBestMSERef.current = Infinity;
     stagnationCounterRef.current = 0;
     adaptiveMutationCounterRef.current = 0;
+    historyMilestonesRef.current = [];
+    lastMilestoneMSERef.current = Infinity;
+    setHistoryMilestones([]);
 
     // Seed population
     populationRef.current = generatePopulation(populationSize, parsedData);
@@ -382,6 +403,16 @@ export function EquationEvolution() {
         fitnessHistoryRef.current.shift();
       }
 
+      // History milestones tracking
+      if (bestMSE < lastMilestoneMSERef.current * 0.90) { // 10% improvement
+        lastMilestoneMSERef.current = bestMSE;
+        historyMilestonesRef.current.push({
+          gen: generationRef.current,
+          mse: bestMSE,
+          eq: astToString(currentPop[0].tree)
+        });
+      }
+
       // Convergence flash
       if (bestMSE <= CONVERGENCE_MSE && convergeFlashRef.current === 0) {
         convergeFlashRef.current = 1;
@@ -396,6 +427,7 @@ export function EquationEvolution() {
         setBestFitness(bestMSE);
         setBestEquation(currentPop[0] ? `y = ${astToString(currentPop[0].tree)}` : '');
         setFitnessHistory([...fitnessHistoryRef.current]);
+        setHistoryMilestones([...historyMilestonesRef.current]);
         setIsAdapting(adaptiveMutationCounterRef.current > 0);
         lastStateUpdate = time;
       }
@@ -524,6 +556,12 @@ export function EquationEvolution() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(bestEquation.replace('y = ', ''));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [bestEquation]);
 
   // ── Fitness sparkline ──────────────────────────────────────
 
@@ -724,10 +762,13 @@ export function EquationEvolution() {
                   id="btn-evolve"
                   onClick={startEvolution}
                   disabled={parsedData.length < 2}
-                  className="flex-[3] flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-r from-violet-600 to-cyan-500 text-white hover:from-violet-500 hover:to-cyan-400 transition-all shadow-[0_0_24px_rgba(139,92,246,0.4)] hover:shadow-[0_0_32px_rgba(139,92,246,0.6)] disabled:opacity-30 disabled:shadow-none active:scale-[0.98]"
+                  className="flex-[3] flex flex-col items-center justify-center gap-1 py-2 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-md active:scale-[0.98] disabled:opacity-30 disabled:shadow-none"
                 >
-                  <Dna className="w-4 h-4" />
-                  Evolve Equation
+                  <div className="flex items-center gap-2 text-sm font-bold">
+                    <Dna className="w-4 h-4" />
+                    Evolve Equation
+                  </div>
+                  <span className="text-[9px] font-medium opacity-60">Genetic algorithms are stochastic. Run multiple times for best results.</span>
                 </button>
               ) : (
                 <>
@@ -861,15 +902,50 @@ export function EquationEvolution() {
                 </div>
               </div>
             )}
+            
+            {/* Extrapolate toggle */}
+            <div className="absolute bottom-3 right-3 z-10 flex gap-2">
+              <button
+                onClick={() => setIsExtrapolating(!isExtrapolating)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold backdrop-blur-md border transition-all ${
+                  isExtrapolating 
+                    ? 'bg-violet-500/20 border-violet-500/50 text-violet-400'
+                    : 'bg-black/60 border-white/10 text-neutral-400 hover:text-white'
+                }`}
+              >
+                <Maximize className="w-3 h-3" />
+                Extrapolate
+              </button>
+            </div>
           </div>
 
           {/* Output Panel */}
           <div className="relative overflow-hidden rounded-xl border border-neutral-200 dark:border-white/8 bg-white/70 dark:bg-black/60 backdrop-blur-sm p-4 md:p-5 shadow-sm">
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent dark:from-white/3 pointer-events-none rounded-xl" />
             <div className="relative z-10 space-y-2">
-              <div className="flex items-center gap-2 text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-bold">
-                <Dna className="w-3 h-3" />
-                Best Equation
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-bold">
+                  <Dna className="w-3 h-3" />
+                  Best Equation
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowHistory(true)}
+                    disabled={historyMilestones.length === 0}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors disabled:opacity-30 disabled:hover:text-neutral-500"
+                  >
+                    <History className="w-3 h-3" />
+                    Derivation History
+                  </button>
+                  <button
+                    onClick={handleCopy}
+                    disabled={!bestEquation}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors disabled:opacity-30 disabled:hover:text-neutral-500"
+                  >
+                    {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                    {copied ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
               </div>
               <div className="font-mono text-base md:text-lg font-bold text-violet-600 dark:text-cyan-300 break-all min-h-[1.75rem] transition-all duration-200">
                 {bestEquation || (
@@ -882,6 +958,36 @@ export function EquationEvolution() {
           </div>
         </div>
       </div>
+      
+      {/* Derivation History Modal */}
+      {showHistory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowHistory(false)}>
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="p-4 md:p-6 border-b border-neutral-200 dark:border-white/10 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-bold">Derivation Trace</h3>
+                <p className="text-xs text-neutral-500">Milestone equations discovered during evolution.</p>
+              </div>
+              <button onClick={() => setShowHistory(false)} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors">
+                <RotateCcw className="w-4 h-4 rotate-45" />
+              </button>
+            </div>
+            <div className="overflow-y-auto p-4 md:p-6 space-y-4 font-mono text-sm">
+              {historyMilestones.map((ms, i) => (
+                <div key={i} className="flex flex-col gap-1 p-3 rounded bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                  <div className="flex justify-between text-[10px] text-neutral-500 font-bold uppercase tracking-wider">
+                    <span>Gen {ms.gen}</span>
+                    <span>MSE: {formatMSE(ms.mse)}</span>
+                  </div>
+                  <div className="font-bold text-violet-600 dark:text-cyan-300">
+                    y = {ms.eq}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
