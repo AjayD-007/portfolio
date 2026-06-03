@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { GlassCard } from "@/components/GlassCard";
-import { ArrowRight, Infinity as InfinityIcon, Sparkles } from "lucide-react";
+import { ArrowRight, Infinity as InfinityIcon, Sparkles, Dna } from "lucide-react";
 
 import type { Metadata } from "next";
 
@@ -32,6 +32,11 @@ export default function MathHubPage() {
         "@type": "SoftwareApplication",
         "name": "Non-Euclidean Corridor",
         "url": "https://ajay-dharmaraj.vercel.app/math/non-euclidean-world"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Equation Evolver",
+        "url": "https://ajay-dharmaraj.vercel.app/math/equation-evolver"
       }
     ]
   };
@@ -148,6 +153,38 @@ export default function MathHubPage() {
                 </span>
                 <span className="px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/10 text-xs font-semibold text-gray-700 dark:text-gray-300 backdrop-blur-sm">
                   TypeScript
+                </span>
+              </div>
+            </GlassCard>
+          </Link>
+
+          {/* Equation Evolver */}
+          <Link href="/math/equation-evolver" className="group h-full block">
+            <GlassCard className="h-full flex flex-col justify-between transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-white/5 cursor-pointer border border-transparent hover:border-black/10 dark:hover:border-white/10">
+              
+              <div className="w-full aspect-video rounded-xl overflow-hidden mb-6 relative bg-gradient-to-br from-violet-100 to-cyan-100 dark:from-violet-950 dark:to-cyan-950 flex items-center justify-center">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(139,92,246,0.15)_0%,_transparent_70%)]" />
+                <Dna className="w-16 h-16 text-violet-400/40 dark:text-violet-300/20 relative z-10 drop-shadow-lg" />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xl font-bold tracking-tight text-black dark:text-white group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                    Equation Evolver
+                  </h2>
+                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 duration-300" />
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">
+                  Paste raw data and watch a genetic algorithm physically evolve the mathematical equation that fits it. See equations mutate, crossover, and converge in real-time.
+                </p>
+              </div>
+              
+              <div className="mt-6 flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/10 text-xs font-semibold text-gray-700 dark:text-gray-300 backdrop-blur-sm">
+                  Genetic Algorithm
+                </span>
+                <span className="px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/10 text-xs font-semibold text-gray-700 dark:text-gray-300 backdrop-blur-sm">
+                  Symbolic Regression
                 </span>
               </div>
             </GlassCard>
