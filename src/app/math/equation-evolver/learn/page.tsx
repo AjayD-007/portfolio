@@ -133,19 +133,24 @@ export default function EquationEvolverLearnPage() {
               <li><strong>Depth limits:</strong> trees are capped at 6 levels deep to prevent &quot;bloat&quot; — equations that grow enormous without improving fitness.</li>
             </ul>
 
-            <h2>Tips for Best Results</h2>
+            <h2>Cleaning Up the Math</h2>
+            <p>
+              Evolution is a messy process. The genetic algorithm will often evolve mathematically correct but incredibly chaotic formulas, like <code>y = 0.503 * x * (x + 0.367 * (1.61 - 5.15 / x))</code>. While technically accurate, it is unreadable to a human.
+            </p>
+            <p>
+              To fix this, the algorithm applies a final <strong>Algebraic Expansion</strong> when it finishes. It mathematically multiplies everything out and cancels redundant variables. Finally, it uses a smart rounding intuition — if a constant is <em>extremely</em> close to a clean number (like <code>0.4968</code>), it snaps it to <code>0.5</code>, mimicking how a human mathematician would write the final equation. This turns biological chaos into a beautifully clean, human-readable polynomial like <code>y = 0.5 * x² + 0.3 * x - 1</code>, complete with a step-by-step derivation trace.
+            </p>
+
+            <h2>Evolution Controls Explained</h2>
             <ul>
               <li>
-                <strong>Population Size</strong> — larger populations explore more of the solution space but run slower. 200 is a good default; try 400-500 for complex data.
+                <strong>Population Size</strong> — This is the size of our &quot;ecosystem.&quot; A larger population means more genetic diversity and a higher chance of finding the perfect equation structure, but it takes more computational energy to simulate each generation. 
               </li>
               <li>
-                <strong>Mutation Rate</strong> — too low and the population stagnates; too high and good solutions get destroyed. 10-15% works well for most datasets.
+                <strong>Mutation Rate</strong> — This controls the level of random radiation in the environment. If it&apos;s too low, the population might inbreed and get stuck in a &quot;local minimum&quot; (a mediocre equation it can&apos;t escape from). If it&apos;s too high, beneficial traits are constantly destroyed before they can be passed on.
               </li>
               <li>
-                <strong>Data quality matters</strong> — the algorithm works best with 20-50 clean data points. Very noisy data or too few points make convergence harder.
-              </li>
-              <li>
-                <strong>Run it multiple times</strong> — genetic algorithms are stochastic. Different runs explore different parts of the solution space and may find different (equally valid) equations.
+                <strong>The Element of Chance</strong> — Because genetic algorithms rely on random mutations and probabilistic selection, they are stochastic. Running the exact same data twice might result in two different evolutionary paths, sometimes yielding two completely different (but equally valid) mathematical formulas.
               </li>
             </ul>
           </div>
