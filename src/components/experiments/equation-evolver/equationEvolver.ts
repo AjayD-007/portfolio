@@ -12,7 +12,7 @@ export type {
 
 export {
   randomTree, evaluateAST, cloneTree, simplifyAST,
-  countNodes, isEqualAST, astToString,
+  countNodes, isEqualAST, astToString, roundConstants,
   optimiseConstants,
 } from './ast';
 
@@ -96,7 +96,7 @@ export function parseCSV(csv: string): DataPoint[] {
 
 // ── Convenience: run a full evolution and return best result ──
 
-import { ASTNode, optimiseConstants, evaluateAST, astToString } from './ast';
+import { ASTNode, optimiseConstants, evaluateAST, astToString, roundConstants } from './ast';
 import { Individual, computeFitness, generatePopulation, evolveOneGeneration } from './genetics';
 
 export interface EvolveOptions {
@@ -147,6 +147,6 @@ export function evolve(data: DataPoint[], opts: EvolveOptions = {}): EvolveResul
   return {
     best:     { tree: bestTree, fitness: computeFitness(bestTree, data) },
     history,
-    equation: `y = ${astToString(bestTree)}`,
+    equation: `y = ${astToString(roundConstants(bestTree))}`,
   };
 }

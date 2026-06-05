@@ -8,17 +8,15 @@ import {
 } from 'lucide-react';
 import {
   type ASTNode, type DataPoint, type Individual,
-  generatePopulation, evolveOneGeneration,
-  evaluateAST, astToString,
+  evaluateAST,
   generateNoisyQuadratic, generateNoisySine, generateNoisyLinear,
   dataToCSV, parseCSV,
 } from './equation-evolver/equationEvolver';
 
 // ── Constants ────────────────────────────────────────────────
 
-const GENS_PER_FRAME = 10;
 const CURVE_SAMPLE_COUNT = 300;
-const MAX_GENERATIONS = 5000;
+const MAX_GENERATIONS = 20000;
 const CONVERGENCE_MSE = 0.01;
 const STATE_UPDATE_INTERVAL = 80; // ms
 
@@ -79,27 +77,21 @@ export function EquationEvolution() {
   const [copied, setCopied] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [historyMilestones, setHistoryMilestones] = useState<{gen: number; mse: number; eq: string}[]>([]);
+  const [simplificationSteps, setSimplificationSteps] = useState<string[]>([]);
 
   // ── Refs ───────────────────────────────────────────────────
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const rafRef = useRef<number | null>(null);
   const populationRef = useRef<Individual[]>([]);
   const generationRef = useRef(0);
   const fitnessHistoryRef = useRef<number[]>([]);
-  const isPausedRef = useRef(false);
+  const isEvolvingRef = useRef(false);
   const convergeFlashRef = useRef(0);
-  
-  // Stagnation detection refs
-  const lastBestMSERef = useRef<number>(Infinity);
-  const stagnationCounterRef = useRef(0);
-  const adaptiveMutationCounterRef = useRef(0);
 
   // History refs
   const historyMilestonesRef = useRef<{gen: number; mse: number; eq: string}[]>([]);
-  const lastMilestoneMSERef = useRef<number>(Infinity);
 
   // ── Derived state ──────────────────────────────────────────
 
@@ -308,7 +300,7 @@ export function EquationEvolution() {
 
     const ro = new ResizeObserver(() => {
       // Redraw with current state
-      drawCanvas(populationRef.current, parsedData, dataRange, 0, adaptiveMutationCounterRef.current > 0);
+      drawCanvas(populationRef.current, parsedData, dataRange, 0, false);
     });
     ro.observe(container);
 
@@ -318,14 +310,96 @@ export function EquationEvolution() {
     return () => ro.disconnect();
   }, [parsedData, dataRange, drawCanvas]);
 
-  // ── Evolution loop ─────────────────────────────────────────
+  // ── Web Worker ─────────────────────────────────────────────
+
+  const workerRef = useRef<Worker | null>(null);
+  // Keep refs in sync for the worker's onmessage closure (mount-only effect)
+  const parsedDataRef = useRef(parsedData);
+  const dataRangeRef = useRef(dataRange);
+  const drawCanvasRef = useRef(drawCanvas);
+  parsedDataRef.current = parsedData;
+  dataRangeRef.current = dataRange;
+  drawCanvasRef.current = drawCanvas;
+
+  // Create worker on mount, terminate on unmount
+  useEffect(() => {
+    const worker = new Worker(
+      new URL('./equation-evolver/evolutionWorker.ts', import.meta.url)
+    );
+
+    worker.onmessage = (e: MessageEvent) => {
+      const msg = e.data;
+
+      if (msg.type === 'progress') {
+        // Store top individuals for drawing
+        populationRef.current = msg.topIndividuals;
+        generationRef.current = msg.generation;
+        fitnessHistoryRef.current = msg.fitnessHistory;
+        historyMilestonesRef.current = msg.milestones;
+
+        // Convergence flash
+        if (msg.bestMSE <= CONVERGENCE_MSE && convergeFlashRef.current === 0) {
+          convergeFlashRef.current = 1;
+        }
+        if (convergeFlashRef.current > 0) {
+          convergeFlashRef.current = Math.max(0, convergeFlashRef.current - 0.02);
+        }
+
+        // Update React state
+        setGeneration(msg.generation);
+        setBestFitness(msg.bestMSE);
+        setBestEquation(msg.bestEquation);
+        setFitnessHistory(msg.fitnessHistory);
+        setHistoryMilestones(msg.milestones);
+        setIsAdapting(msg.adapting);
+        if (msg.simplificationSteps) {
+          setSimplificationSteps(msg.simplificationSteps);
+        }
+
+        // Draw canvas with the top individuals (use refs for latest values)
+        drawCanvasRef.current(
+          msg.topIndividuals,
+          parsedDataRef.current,
+          dataRangeRef.current,
+          convergeFlashRef.current,
+          msg.adapting,
+        );
+      }
+
+      if (msg.type === 'done') {
+        setIsEvolving(false);
+        isEvolvingRef.current = false;
+        if (msg.converged) setConverged(true);
+      }
+    };
+
+    worker.onerror = (err) => {
+      console.error('[EvolutionWorker] Error:', err.message);
+      setIsEvolving(false);
+      isEvolvingRef.current = false;
+    };
+
+    workerRef.current = worker;
+
+    return () => {
+      worker.terminate();
+      workerRef.current = null;
+    };
+  }, []); // only mount/unmount
+
+  // Redraw when parsedData/dataRange change (worker messages will draw too, 
+  // but we need this for when the worker isn't running)
+  useEffect(() => {
+    drawCanvas(populationRef.current, parsedData, dataRange, 0, false);
+  }, [parsedData, dataRange, drawCanvas]);
+
+  // ── Evolution controls ─────────────────────────────────────
 
   const startEvolution = useCallback(() => {
     if (parsedData.length < 2) return;
+    if (!workerRef.current) return;
 
     // Reset state
-    generationRef.current = 0;
-    fitnessHistoryRef.current = [];
     convergeFlashRef.current = 0;
     setGeneration(0);
     setBestFitness(0);
@@ -334,147 +408,43 @@ export function EquationEvolution() {
     setConverged(false);
     setIsAdapting(false);
     setIsEvolving(true);
+    isEvolvingRef.current = true;
     setIsPaused(false);
-    isPausedRef.current = false;
-    lastBestMSERef.current = Infinity;
-    stagnationCounterRef.current = 0;
-    adaptiveMutationCounterRef.current = 0;
-    historyMilestonesRef.current = [];
-    lastMilestoneMSERef.current = Infinity;
     setHistoryMilestones([]);
 
-    // Seed population
-    populationRef.current = generatePopulation(populationSize, parsedData);
-
-    let lastStateUpdate = performance.now();
-
-    const loop = (time: number) => {
-      if (isPausedRef.current) {
-        rafRef.current = requestAnimationFrame(loop);
-        return;
-      }
-
-      const pop = populationRef.current;
-      let currentPop = pop;
-
-      // Run multiple generations per frame
-      for (let i = 0; i < GENS_PER_FRAME; i++) {
-        let currentMutationRate = mutationRate;
-        
-        // ── Stagnation & Adaptive Mutation Logic ──
-        const currentBestMSE = currentPop[0]?.fitness ?? Infinity;
-        
-        if (adaptiveMutationCounterRef.current > 0) {
-          // Actively spiking mutation
-          currentMutationRate = 0.80; // Spike to 80%
-          adaptiveMutationCounterRef.current--;
-        } else {
-          // Check for stagnation
-          if (lastBestMSERef.current !== Infinity) {
-             const improvement = (lastBestMSERef.current - currentBestMSE) / lastBestMSERef.current;
-             if (improvement < 0.01) {
-               stagnationCounterRef.current++;
-             } else {
-               stagnationCounterRef.current = 0;
-             }
-          }
-          
-          if (stagnationCounterRef.current >= 15) {
-             // Trigger adaptive mutation!
-             adaptiveMutationCounterRef.current = 5;
-             stagnationCounterRef.current = 0;
-             currentMutationRate = 0.80;
-          }
-        }
-        
-        lastBestMSERef.current = currentBestMSE;
-        // ───────────────────────────────────────────
-
-        currentPop = evolveOneGeneration(currentPop, parsedData, currentMutationRate);
-        generationRef.current++;
-      }
-
-      populationRef.current = currentPop;
-
-      // Track fitness history
-      const bestMSE = currentPop[0]?.fitness ?? 0;
-      fitnessHistoryRef.current.push(bestMSE);
-      if (fitnessHistoryRef.current.length > 150) {
-        fitnessHistoryRef.current.shift();
-      }
-
-      // History milestones tracking
-      if (bestMSE < lastMilestoneMSERef.current * 0.90) { // 10% improvement
-        lastMilestoneMSERef.current = bestMSE;
-        historyMilestonesRef.current.push({
-          gen: generationRef.current,
-          mse: bestMSE,
-          eq: astToString(currentPop[0].tree)
-        });
-      }
-
-      // Convergence flash
-      if (bestMSE <= CONVERGENCE_MSE && convergeFlashRef.current === 0) {
-        convergeFlashRef.current = 1;
-      }
-      if (convergeFlashRef.current > 0) {
-        convergeFlashRef.current = Math.max(0, convergeFlashRef.current - 0.02);
-      }
-
-      // Update React state (throttled)
-      if (time - lastStateUpdate > STATE_UPDATE_INTERVAL) {
-        setGeneration(generationRef.current);
-        setBestFitness(bestMSE);
-        setBestEquation(currentPop[0] ? `y = ${astToString(currentPop[0].tree)}` : '');
-        setFitnessHistory([...fitnessHistoryRef.current]);
-        setHistoryMilestones([...historyMilestonesRef.current]);
-        setIsAdapting(adaptiveMutationCounterRef.current > 0);
-        lastStateUpdate = time;
-      }
-
-      // Draw every frame
-      drawCanvas(currentPop, parsedData, dataRange, convergeFlashRef.current, adaptiveMutationCounterRef.current > 0);
-
-      // Stopping conditions
-      if (generationRef.current >= MAX_GENERATIONS || bestMSE <= CONVERGENCE_MSE) {
-        // Final state update
-        setGeneration(generationRef.current);
-        setBestFitness(bestMSE);
-        setBestEquation(currentPop[0] ? `y = ${astToString(currentPop[0].tree)}` : '');
-        setFitnessHistory([...fitnessHistoryRef.current]);
-        setIsEvolving(false);
-        if (bestMSE <= CONVERGENCE_MSE) setConverged(true);
-        rafRef.current = null;
-        return;
-      }
-
-      rafRef.current = requestAnimationFrame(loop);
-    };
-
-    rafRef.current = requestAnimationFrame(loop);
-  }, [parsedData, dataRange, populationSize, mutationRate, drawCanvas]);
+    // Tell the worker to start
+    workerRef.current.postMessage({
+      type: 'start',
+      payload: {
+        populationSize,
+        mutationRate,
+        data: parsedData,
+      },
+    });
+  }, [parsedData, populationSize, mutationRate]);
 
   const togglePause = useCallback(() => {
     setIsPaused(p => {
       const next = !p;
-      isPausedRef.current = next;
+      if (workerRef.current) {
+        workerRef.current.postMessage({ type: next ? 'pause' : 'resume' });
+      }
       return next;
     });
   }, []);
 
   const stopEvolution = useCallback(() => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = null;
+    if (workerRef.current) {
+      workerRef.current.postMessage({ type: 'stop' });
+    }
     setIsEvolving(false);
+    isEvolvingRef.current = false;
     setIsPaused(false);
-    isPausedRef.current = false;
   }, []);
 
   const resetAll = useCallback(() => {
     stopEvolution();
     populationRef.current = [];
-    generationRef.current = 0;
-    fitnessHistoryRef.current = [];
     setGeneration(0);
     setBestFitness(0);
     setBestEquation('');
@@ -550,12 +520,7 @@ export function EquationEvolution() {
     reader.readAsText(file);
   }, []);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
+
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(bestEquation.replace('y = ', ''));
@@ -972,18 +937,37 @@ export function EquationEvolution() {
                 <RotateCcw className="w-4 h-4 rotate-45" />
               </button>
             </div>
-            <div className="overflow-y-auto p-4 md:p-6 space-y-4 font-mono text-sm">
-              {historyMilestones.map((ms, i) => (
-                <div key={i} className="flex flex-col gap-1 p-3 rounded bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
-                  <div className="flex justify-between text-[10px] text-neutral-500 font-bold uppercase tracking-wider">
-                    <span>Gen {ms.gen}</span>
-                    <span>MSE: {formatMSE(ms.mse)}</span>
-                  </div>
-                  <div className="font-bold text-violet-600 dark:text-cyan-300">
-                    y = {ms.eq}
-                  </div>
+            <div className="overflow-y-auto p-4 md:p-6 space-y-8 font-mono text-sm">
+              {simplificationSteps.length > 0 && (
+                <div className="space-y-4">
+                  <div className="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">Final Simplification Steps</div>
+                  {simplificationSteps.map((step, i) => (
+                    <div key={`step-${i}`} className="flex flex-col gap-1 p-3 rounded bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
+                      <div className="flex justify-between text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
+                        <span>Step {i + 1}</span>
+                      </div>
+                      <div className="font-bold text-violet-600 dark:text-cyan-300">
+                        {step}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+              
+              <div className="space-y-4">
+                <div className="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">Evolution Milestones</div>
+                {historyMilestones.map((ms, i) => (
+                  <div key={`ms-${i}`} className="flex flex-col gap-1 p-3 rounded bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                    <div className="flex justify-between text-[10px] text-neutral-500 font-bold uppercase tracking-wider">
+                      <span>Gen {ms.gen}</span>
+                      <span>MSE: {formatMSE(ms.mse)}</span>
+                    </div>
+                    <div className="font-bold text-violet-600 dark:text-cyan-300">
+                      y = {ms.eq}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

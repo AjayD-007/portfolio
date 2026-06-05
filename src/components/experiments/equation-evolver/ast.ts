@@ -3,6 +3,7 @@
 //           pretty-printing, and constant optimisation.
 // ─────────────────────────────────────────────────────────────
 
+import { parse, simplify, rationalize, MathNode, SymbolNode, OperatorNode, ConstantNode, FunctionNode, ParenthesisNode } from 'mathjs';
 // ── Types ────────────────────────────────────────────────────
 
 export type BinOp  = '+' | '-' | '*' | '/' | '^';
@@ -181,98 +182,174 @@ export function replaceNode(root: ASTNode, targetIdx: number, replacement: ASTNo
 
 // ── Algebraic simplification ─────────────────────────────────
 
-function isNum(n: ASTNode, v: number): boolean {
-  return n.type === 'num' && Math.abs(n.value - v) < 1e-10;
+function mathNodeToAST(node: MathNode): ASTNode {
+  if ((node as any).isConstantNode) {
+    return { type: 'num', value: Number((node as ConstantNode).value) };
+  }
+  if ((node as any).isSymbolNode) {
+    const name = (node as SymbolNode).name;
+    if (name === 'x') return { type: 'var' };
+    if (name === 'pi' || name === 'e') return { type: 'const', name };
+    return { type: 'var' };
+  }
+  if ((node as any).isParenthesisNode) {
+    return mathNodeToAST((node as ParenthesisNode).content);
+  }
+  if ((node as any).isOperatorNode) {
+    const opNode = node as OperatorNode;
+    if (opNode.args.length === 1) {
+      if (opNode.op === '-') {
+        return {
+          type: 'binop',
+          op: '*',
+          left: { type: 'num', value: -1 },
+          right: mathNodeToAST(opNode.args[0])
+        };
+      }
+      if (opNode.op === '+') return mathNodeToAST(opNode.args[0]);
+    }
+    if (opNode.args.length === 2) {
+      return {
+        type: 'binop',
+        op: opNode.op as BinOp,
+        left: mathNodeToAST(opNode.args[0]),
+        right: mathNodeToAST(opNode.args[1])
+      };
+    }
+  }
+  if ((node as any).isFunctionNode) {
+    const fnNode = node as FunctionNode;
+    let fnName = fnNode.fn.name;
+    if (fnName === 'log') fnName = 'ln';
+    return {
+      type: 'unaryop',
+      op: fnName as UnaryOp,
+      child: mathNodeToAST(fnNode.args[0])
+    };
+  }
+  return { type: 'num', value: 0 };
 }
 
-/** Recursively simplify an AST (constant folding + algebraic identities). */
-export function simplifyAST(node: ASTNode): ASTNode {
+/** Fast, safe algebraic simplifier that folds constants and removes trivial ops without ever hanging. */
+export function fastSimplifyAST(node: ASTNode): ASTNode {
+  if (node.type === 'num' || node.type === 'var' || node.type === 'const') return cloneTree(node);
+  
   if (node.type === 'unaryop') {
-    const child = simplifyAST(node.child);
+    const child = fastSimplifyAST(node.child);
     if (child.type === 'num') {
-      let val: number;
-      switch (node.op) {
-        case 'sin':  val = Math.sin(child.value); break;
-        case 'cos':  val = Math.cos(child.value); break;
-        case 'ln':   val = child.value <= 0 ? NaN : Math.log(child.value); break;
-        case 'sqrt': val = child.value < 0  ? NaN : Math.sqrt(child.value); break;
-      }
-      if (isFinite(val!)) return { type: 'num', value: parseFloat(val!.toFixed(4)) };
+      try {
+        const val = evaluateAST({ type: 'unaryop', op: node.op, child }, 0);
+        if (isFinite(val)) return { type: 'num', value: parseFloat(val.toFixed(3)) };
+      } catch (e) {}
     }
     return { type: 'unaryop', op: node.op, child };
   }
 
   if (node.type === 'binop') {
-    const left  = simplifyAST(node.left);
-    const right = simplifyAST(node.right);
-
+    const left = fastSimplifyAST(node.left);
+    const right = fastSimplifyAST(node.right);
+    
     // Constant folding
     if (left.type === 'num' && right.type === 'num') {
-      const l = left.value, r = right.value;
-      let val = NaN;
-      switch (node.op) {
-        case '+': val = l + r; break;
-        case '-': val = l - r; break;
-        case '*': val = l * r; break;
-        case '/': val = Math.abs(r) < 1e-10 ? 1 : l / r; break;
-        case '^': {
-          const exp = Math.max(-5, Math.min(5, r));
-          val = Math.pow(Math.abs(l), exp);
-          if (l < 0 && Number.isInteger(exp) && exp % 2 !== 0) val = -val;
-          break;
-        }
-      }
-      if (isFinite(val)) return { type: 'num', value: parseFloat(val.toFixed(4)) };
+      try {
+        const val = evaluateAST({ type: 'binop', op: node.op, left, right }, 0);
+        if (isFinite(val)) return { type: 'num', value: parseFloat(val.toFixed(3)) };
+      } catch (e) {}
     }
 
-    // Merge additive negatives: A + (-B) → A - B and A - (-B) → A + B
-    if (node.op === '+' && right.type === 'num' && right.value < 0) {
-      return simplifyAST({ type: 'binop', op: '-', left, right: { type: 'num', value: -right.value } });
+    // Trivial identities
+    if (left.type === 'num') {
+      if (left.value === 0 && (node.op === '+' || node.op === '-')) return right;
+      if (left.value === 0 && node.op === '*') return { type: 'num', value: 0 };
+      if (left.value === 1 && node.op === '*') return right;
     }
-    if (node.op === '-' && right.type === 'num' && right.value < 0) {
-      return simplifyAST({ type: 'binop', op: '+', left, right: { type: 'num', value: -right.value } });
-    }
-
-    // Additive identities
-    if (node.op === '+' || node.op === '-') {
-      if (isNum(left,  0)) return node.op === '+' ? right : simplifyAST({ type: 'binop', op: '*', left: { type: 'num', value: -1 }, right });
-      if (isNum(right, 0)) return left;
-      if (node.op === '-' && isEqualAST(left, right)) return { type: 'num', value: 0 };
-      if (node.op === '+' && isEqualAST(left, right)) return simplifyAST({ type: 'binop', op: '*', left: { type: 'num', value: 2 }, right });
-    }
-
-    // Multiplicative identities
-    if (node.op === '*') {
-      if (isNum(left,  0) || isNum(right, 0)) return { type: 'num', value: 0 };
-      if (isNum(left,  1)) return right;
-      if (isNum(right, 1)) return left;
-      if (isNum(right, -1)) return simplifyAST({ type: 'binop', op: '*', left: right, right: left });
-      if (isEqualAST(left, right)) return simplifyAST({ type: 'binop', op: '^', left, right: { type: 'num', value: 2 } });
-    }
-
-    // Division identities
-    if (node.op === '/') {
-      if (isNum(left,  0)) return { type: 'num', value: 0 };
-      if (isNum(right, 1)) return left;
-      if (isEqualAST(left, right)) return { type: 'num', value: 1 };
-      // A / (1/B) → A * B
-      if (right.type === 'binop' && right.op === '/' && isNum(right.left, 1)) {
-        return simplifyAST({ type: 'binop', op: '*', left, right: right.right });
-      }
-    }
-
-    // Power identities
-    if (node.op === '^') {
-      if (isNum(right, 0)) return { type: 'num', value: 1 };
-      if (isNum(right, 1)) return left;
-      if (isNum(left,  0)) return { type: 'num', value: 0 };
-      if (isNum(left,  1)) return { type: 'num', value: 1 };
+    if (right.type === 'num') {
+      if (right.value === 0 && (node.op === '+' || node.op === '-')) return left;
+      if (right.value === 0 && node.op === '*') return { type: 'num', value: 0 };
+      if (right.value === 1 && node.op === '*') return left;
+      if (right.value === 1 && node.op === '/') return left;
+      if (right.value === 1 && node.op === '^') return left;
+      if (right.value === 0 && node.op === '^') return { type: 'num', value: 1 };
     }
 
     return { type: 'binop', op: node.op, left, right };
   }
 
   return cloneTree(node);
+}
+
+/** Recursively simplify an AST using mathjs for deep algebraic simplification. Use fast=true for the evolution loop to prevent hanging. */
+export function simplifyAST(node: ASTNode, fast: boolean = false): ASTNode {
+  if (fast) return fastSimplifyAST(node);
+  try {
+    let expr = astToString(node, false);
+    expr = expr.replace(/\bln\(/g, 'log(');
+    expr = expr.replace(/π/g, 'pi');
+    
+    const mathNode = parse(expr);
+    const simplified = simplify(mathNode, {}, { exactFractions: false });
+    return mathNodeToAST(simplified);
+  } catch (e) {
+    // Fallback to fast tree if mathjs fails
+    return fastSimplifyAST(node);
+  }
+}
+
+/** Fully expands polynomials (e.g. 2*(x-3) -> 2*x - 6) for final human-readable display using math.rationalize. */
+export function expandAST(node: ASTNode): ASTNode {
+  let expr = '';
+  try {
+    expr = astToString(node, false);
+    expr = expr.replace(/\bln\(/g, 'log(');
+    expr = expr.replace(/π/g, 'pi');
+    
+    const mathNode = parse(expr);
+    // rationalize fully expands polynomials, then simplify converts huge fractions back to decimals
+    const rationalized = rationalize(mathNode);
+    const expanded = simplify(rationalized, {}, { exactFractions: false });
+    return roundConstants(mathNodeToAST(expanded), 0.05);
+  } catch (e: any) {
+    console.error('[expandAST] Mathjs rationalize failed:', e.message, 'for eq:', expr);
+    // Mathjs rationalize fails on non-polynomials (like sin/cos/ln)
+    // Fallback to standard simplification
+    return roundConstants(simplifyAST(node, false), 0.05);
+  }
+}
+
+/** Round constants to nice human-readable values (integers, tenths, hundredths) if very close. */
+export function roundConstants(node: ASTNode, tolerance: number = 0.05): ASTNode {
+  const cloned = cloneTree(node);
+  const nums = collectNumNodes(cloned);
+  for (const n of nums) {
+    const roundInt = Math.round(n.value);
+    
+    // WARNING: Do NOT aggressively snap to 0! Small coefficients (like 0.0007) are often critical
+    // multipliers for x^3 or x^4. Only snap to 0 if it's microscopically small.
+    if (roundInt === 0) {
+      if (Math.abs(n.value) < 1e-5) {
+        n.value = 0;
+      }
+      // If it's small but not microscopic (e.g. 0.0007), leave it alone!
+      // But we still want to check if it's close to 0.1, 0.01 etc. below.
+    } else if (Math.abs(n.value - roundInt) < tolerance) {
+      n.value = roundInt;
+      continue;
+    }
+    
+    // Snap to nearest 0.1 if it's extremely close
+    const roundTenth = Math.round(n.value * 10) / 10;
+    if (Math.abs(n.value - roundTenth) < (tolerance / 2)) {
+      n.value = roundTenth;
+      continue;
+    }
+
+    // Snap to nearest 0.01 if it's super close
+    const roundHundredth = Math.round(n.value * 100) / 100;
+    if (Math.abs(n.value - roundHundredth) < (tolerance / 4)) {
+      n.value = roundHundredth;
+    }
+  }
+  return cloned;
 }
 
 // ── Constant Optimisation (Nelder–Mead on numeric leaves) ────

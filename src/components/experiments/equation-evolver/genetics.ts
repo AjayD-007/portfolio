@@ -182,7 +182,7 @@ export function generatePopulation(
   for (let i = 0; i < size; i++) {
     // Ramp depth from 2..maxDepth to ensure variety
     const depth = 2 + (i % (maxDepth - 1));
-    const tree  = simplifyAST(randomTree(depth));
+    const tree  = simplifyAST(randomTree(depth), true);
     pop.push({ tree, fitness: computeFitness(tree, data) });
   }
 
@@ -192,11 +192,13 @@ export function generatePopulation(
 
 // ── Evolution ─────────────────────────────────────────────────
 
-/** Run one full generational cycle. Returns new population sorted by fitness. */
+/** Run one full generational cycle. Returns new population sorted by fitness.
+ *  When `doSimplify` is false, the expensive mathjs CAS pass is skipped. */
 export function evolveOneGeneration(
   population:   Individual[],
   data:         DataPoint[],
   mutationRate: number,
+  doSimplify:   boolean = true,
 ): Individual[] {
   const size    = population.length;
   const nextGen: Individual[] = [];
@@ -213,8 +215,13 @@ export function evolveOneGeneration(
 
     let [childA, childB] = crossover(parentA.tree, parentB.tree);
 
-    childA = simplifyAST(mutate(childA, mutationRate));
-    childB = simplifyAST(mutate(childB, mutationRate));
+    childA = mutate(childA, mutationRate);
+    childB = mutate(childB, mutationRate);
+
+    if (doSimplify) {
+      childA = simplifyAST(childA, true);
+      childB = simplifyAST(childB, true);
+    }
 
     nextGen.push({ tree: childA, fitness: computeFitness(childA, data) });
     if (nextGen.length < size) {
