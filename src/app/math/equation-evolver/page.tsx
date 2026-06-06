@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { EquationEvolution } from "@/components/experiments/EquationEvolution";
+import { Container } from "@/components/layout/Container";
+import { Heading, Text } from "@/components/ui/Typography";
 
 export const metadata: Metadata = {
   title: "Equation Evolver — Symbolic Regression | AjayD",
@@ -41,35 +43,33 @@ export default function EquationEvolverPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main className="min-h-screen pt-4 pb-16 px-4 md:px-6">
-        <div className="container mx-auto">
-          <div className="mb-8">
+      <Container maxWidth="full" className="min-h-screen pt-4 pb-16 flex-grow">
+        <div className="mb-8">
+          <Link
+            href="/math"
+            className="inline-flex items-center transition-colors mb-6 text-[var(--text-muted)] hover:text-[var(--text-main)]"
+          >
+            <Text variant="label" className="flex items-center gap-2"><ArrowLeft className="w-4 h-4" /> Back to Experiments</Text>
+          </Link>
+
+          <Heading level={1} variant="section" className="!mb-2">
+            Equation Evolver
+          </Heading>
+          <Text variant="body" className="">
+            Paste raw data and watch a genetic algorithm discover the hidden
+            mathematical equation. Equations mutate, crossover, and converge —
+            all visualized in real-time.{" "}
             <Link
-              href="/math"
-              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors mb-6"
+              href="/math/equation-evolver/learn"
+              className="text-[var(--text-main)] underline font-semibold"
             >
-              <ArrowLeft className="w-4 h-4" /> Back to Experiments
+              How does this work? →
             </Link>
-
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tighter text-black dark:text-white mb-2">
-              Equation Evolver
-            </h1>
-            <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl font-medium">
-              Paste raw data and watch a genetic algorithm discover the hidden
-              mathematical equation. Equations mutate, crossover, and converge —
-              all visualized in real-time.{" "}
-              <Link
-                href="/math/equation-evolver/learn"
-                className="text-black dark:text-white hover:underline font-semibold"
-              >
-                How does this work? →
-              </Link>
-            </p>
-          </div>
-
-          <EquationEvolution />
+          </Text>
         </div>
-      </main>
+
+        <EquationEvolution />
+      </Container>
     </>
   );
 }

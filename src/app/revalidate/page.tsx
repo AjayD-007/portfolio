@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GlassCard } from "@/components/GlassCard";
+import { Card } from "@/components/ui/Card";
 
 export default function RevalidatePage() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -40,7 +40,7 @@ export default function RevalidatePage() {
         </p>
       </div>
 
-      <GlassCard className="p-8 md:p-12 relative overflow-hidden group">
+      <Card variant="default" className="relative group">
         <h2 className="text-2xl font-black mb-4">Revalidate Blog Cache</h2>
         
         <p className="text-gray-800 dark:text-gray-300 font-medium mb-6 leading-relaxed">
@@ -69,7 +69,7 @@ export default function RevalidatePage() {
             ❌ {message}
           </div>
         )}
-      </GlassCard>
+      </Card>
     </div>
   );
 }

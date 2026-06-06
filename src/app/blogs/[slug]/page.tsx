@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { GlassCard } from "@/components/GlassCard";
+import { Card } from "@/components/ui/Card";
 import { Metadata, ResolvingMetadata } from "next";
+import { Container } from "@/components/layout/Container";
+import { Heading, Text } from "@/components/ui/Typography";
 
 const DEV_TO_USERNAME = "ajay_dharmaraj";
 
@@ -84,7 +86,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   };
 
   return (
-    <article className="relative container mx-auto px-6 md:px-12 py-12 md:py-24 z-10 flex-grow max-w-4xl">
+    <Container maxWidth="4xl" className="py-12 md:py-24 z-10 flex-grow">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -92,27 +94,27 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       <div className="mb-12">
         <Link 
           href="/blogs" 
-          className="inline-flex items-center text-sm font-mono font-bold tracking-widest uppercase text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors mb-8"
+          className="inline-flex items-center transition-colors mb-8 text-[var(--text-muted)] hover:text-[var(--text-main)]"
         >
-          &larr; Back to Writings
+          <Text variant="label">&larr; Back to Writings</Text>
         </Link>
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-6 leading-tight">
+        <Heading level={1} variant="section" className="!mb-6 leading-tight">
           {article.title}
-        </h1>
-        <div className="flex flex-wrap items-center gap-4 text-sm font-mono font-bold text-gray-600 dark:text-gray-400 tracking-widest uppercase">
-          <span>{new Date(article.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-          <span>•</span>
-          <span>{article.reading_time_minutes} min read</span>
+        </Heading>
+        <div className="flex flex-wrap items-center gap-4">
+          <Text variant="label" className="text-[var(--text-muted)]">{new Date(article.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</Text>
+          <Text variant="label" className="text-[var(--text-muted)]">•</Text>
+          <Text variant="label" className="text-[var(--text-muted)]">{article.reading_time_minutes} min read</Text>
         </div>
       </div>
 
-      <GlassCard className="prose prose-lg dark:prose-invert max-w-none bg-white/60 dark:bg-black/40 backdrop-blur-xl p-8 md:p-12 rounded-3xl" delay={0.1}>
+      <Card variant="default" className="prose prose-lg dark:prose-invert max-w-none w-full" delay={0.1}>
         {/* Render the sanitized HTML returned by Dev.to directly */}
         <div 
           dangerouslySetInnerHTML={{ __html: article.body_html }} 
           className="article-content"
         />
-      </GlassCard>
+      </Card>
 
       {/* Basic styles to make the external HTML look decent */}
       <style dangerouslySetInnerHTML={{__html: `
@@ -136,6 +138,6 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         .article-content .highlight .fullscreen-button,
         .article-content .highlight svg { display: none !important; }
       `}} />
-    </article>
+    </Container>
   );
 }

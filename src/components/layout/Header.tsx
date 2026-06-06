@@ -6,6 +6,9 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
+import { Container } from "@/components/layout/Container";
+import { Card } from "@/components/ui/Card";
+import { Text } from "@/components/ui/Typography";
 
 export function Header() {
   const pathname = usePathname();
@@ -29,9 +32,9 @@ export function Header() {
   ];
 
   return (
-    <header className={`w-full z-50 px-4 md:px-6 pt-6 pointer-events-auto ${isImmersivePage ? 'fixed top-0 left-0' : 'relative'}`}>
-      <div className="container mx-auto max-w-7xl">
-        <div className="flex items-center justify-between bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 p-4 rounded-2xl shadow-xl shadow-black/5">
+    <header className={`w-full z-50 pt-6 pointer-events-auto ${isImmersivePage ? 'fixed top-0 left-0' : 'relative'}`}>
+      <Container maxWidth="7xl">
+        <Card variant="nav">
           <div className="flex items-center gap-6 md:gap-8">
             <Link href="/" className="block">
               <Image src="/logo.png" alt="AD Logo" width={40} height={40} className="rounded-lg" priority />
@@ -41,18 +44,18 @@ export function Header() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-xs md:text-sm font-bold tracking-widest uppercase transition-colors ${
+                  className={`transition-colors ${
                     pathname === link.href 
                       ? "text-black dark:text-white" 
                       : "text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
                   }`}
                 >
-                  {link.name}
+                  <Text variant="label" className="!font-bold">{link.name}</Text>
                 </Link>
               ))}
             </nav>
           </div>
-          
+          <div className="flex-1"></div>
           <div className="flex items-center gap-4">
             {viewCount !== null ? (
               <div
@@ -73,8 +76,8 @@ export function Header() {
             )}
             <ThemeToggle />
           </div>
-        </div>
-      </div>
+        </Card>
+      </Container>
     </header>
   );
 }

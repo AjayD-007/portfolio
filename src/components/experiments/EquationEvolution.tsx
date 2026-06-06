@@ -584,7 +584,7 @@ export function EquationEvolution() {
           {/* Data Input */}
           <section className="space-y-3">
             <h2 className="text-sm font-extrabold uppercase tracking-wider border-b border-neutral-300 dark:border-white/10 pb-2 flex items-center gap-2">
-              <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-[10px] font-black">1</span>
+              <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-mini font-black">1</span>
               Data Points
             </h2>
               <textarea
@@ -600,7 +600,7 @@ export function EquationEvolution() {
               className="w-full h-36 p-3 text-xs rounded-lg bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-white/10 placeholder:text-neutral-400 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 disabled:opacity-40 resize-none font-mono shadow-sm transition-colors leading-relaxed"
             />
             {uploadError && (
-              <p className="text-[10px] font-bold text-red-500 mt-1">
+              <p className="text-mini font-bold text-red-500 mt-1">
                 Invalid data format. Please use X, Y numeric pairs.
               </p>
             )}
@@ -615,7 +615,7 @@ export function EquationEvolution() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isEvolving}
-                className="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-wider py-1.5 rounded bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 hover:bg-neutral-200 dark:hover:bg-white/10 transition-colors disabled:opacity-40 text-neutral-600 dark:text-neutral-400"
+                className="flex-1 flex items-center justify-center gap-1.5 text-mini font-bold uppercase tracking-wider py-1.5 rounded bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 hover:bg-neutral-200 dark:hover:bg-white/10 transition-colors disabled:opacity-40 text-neutral-600 dark:text-neutral-400"
               >
                 <FileText className="w-3.5 h-3.5" />
                 Upload CSV
@@ -623,7 +623,7 @@ export function EquationEvolution() {
               <button
                 onClick={clearData}
                 disabled={isEvolving}
-                className="flex-[0.5] flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-wider py-1.5 rounded bg-red-100/50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 hover:bg-red-200/50 dark:hover:bg-red-500/20 transition-colors disabled:opacity-40 text-red-600 dark:text-red-400"
+                className="flex-[0.5] flex items-center justify-center gap-1.5 text-mini font-bold uppercase tracking-wider py-1.5 rounded bg-red-100/50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 hover:bg-red-200/50 dark:hover:bg-red-500/20 transition-colors disabled:opacity-40 text-red-600 dark:text-red-400"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Clear
@@ -634,7 +634,7 @@ export function EquationEvolution() {
                 id="preset-quad"
                 onClick={() => loadPreset('quad')}
                 disabled={isEvolving}
-                className={`flex-1 text-[10px] font-bold uppercase tracking-wider py-1.5 rounded border transition-colors disabled:opacity-40 ${
+                className={`flex-1 text-mini font-bold uppercase tracking-wider py-1.5 rounded border transition-colors disabled:opacity-40 ${
                   activePreset === 'quad'
                     ? 'bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black border-transparent'
                     : 'bg-neutral-100 dark:bg-white/5 border-neutral-200 dark:border-white/10 hover:bg-neutral-200 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-400'
@@ -646,7 +646,7 @@ export function EquationEvolution() {
                 id="preset-sine"
                 onClick={() => loadPreset('sine')}
                 disabled={isEvolving}
-                className={`flex-1 text-[10px] font-bold uppercase tracking-wider py-1.5 rounded border transition-colors disabled:opacity-40 ${
+                className={`flex-1 text-mini font-bold uppercase tracking-wider py-1.5 rounded border transition-colors disabled:opacity-40 ${
                   activePreset === 'sine'
                     ? 'bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black border-transparent'
                     : 'bg-neutral-100 dark:bg-white/5 border-neutral-200 dark:border-white/10 hover:bg-neutral-200 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-400'
@@ -658,7 +658,7 @@ export function EquationEvolution() {
                 id="preset-linear"
                 onClick={() => loadPreset('linear')}
                 disabled={isEvolving}
-                className={`flex-1 text-[10px] font-bold uppercase tracking-wider py-1.5 rounded border transition-colors disabled:opacity-40 ${
+                className={`flex-1 text-mini font-bold uppercase tracking-wider py-1.5 rounded border transition-colors disabled:opacity-40 ${
                   activePreset === 'linear'
                     ? 'bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black border-transparent'
                     : 'bg-neutral-100 dark:bg-white/5 border-neutral-200 dark:border-white/10 hover:bg-neutral-200 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-400'
@@ -667,7 +667,7 @@ export function EquationEvolution() {
                 Linear
               </button>
             </div>
-            <p className="text-[10px] text-neutral-400 font-mono">
+            <p className="text-mini text-neutral-400 font-mono">
               {parsedData.length} data point{parsedData.length !== 1 ? 's' : ''} loaded
             </p>
           </section>
@@ -675,7 +675,7 @@ export function EquationEvolution() {
           {/* Evolution Controls */}
           <section className="space-y-4">
             <h2 className="text-sm font-extrabold uppercase tracking-wider border-b border-neutral-300 dark:border-white/10 pb-2 flex items-center gap-2">
-              <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-[10px] font-black">2</span>
+              <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-mini font-black">2</span>
               <SlidersHorizontal className="w-3.5 h-3.5" />
               Evolution Parameters
             </h2>
@@ -697,7 +697,7 @@ export function EquationEvolution() {
                 disabled={isEvolving}
                 className="w-full h-1.5 accent-violet-500 cursor-pointer disabled:opacity-40"
               />
-              <p className="text-[10px] text-neutral-500 leading-tight">Larger populations find better equations but require more CPU.</p>
+              <p className="text-mini text-neutral-500 leading-tight">Larger populations find better equations but require more CPU.</p>
             </div>
 
             {/* Mutation Rate */}
@@ -717,7 +717,7 @@ export function EquationEvolution() {
                 disabled={isEvolving}
                 className="w-full h-1.5 accent-violet-500 cursor-pointer disabled:opacity-40"
               />
-              <p className="text-[10px] text-neutral-500 leading-tight">Higher randomness prevents the algorithm from getting stuck in local minima.</p>
+              <p className="text-mini text-neutral-500 leading-tight">Higher randomness prevents the algorithm from getting stuck in local minima.</p>
             </div>
 
             {/* Action Buttons */}
@@ -733,7 +733,7 @@ export function EquationEvolution() {
                     <Dna className="w-4 h-4" />
                     Evolve Equation
                   </div>
-                  <span className="text-[9px] font-medium opacity-60">Genetic algorithms are stochastic. Run multiple times for best results.</span>
+                  <span className="text-micro font-medium opacity-60">Genetic algorithms are stochastic. Run multiple times for best results.</span>
                 </button>
               ) : (
                 <>
@@ -773,12 +773,12 @@ export function EquationEvolution() {
           {/* Live Metrics */}
           <section className="space-y-3">
             <h2 className="text-sm font-extrabold uppercase tracking-wider border-b border-neutral-300 dark:border-white/10 pb-2 flex items-center gap-2">
-              <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-[10px] font-black">3</span>
+              <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-mini font-black">3</span>
               Live Metrics
             </h2>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-white/8 p-3 rounded-lg">
-                <div className="flex items-center gap-1.5 text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-bold mb-1">
+                <div className="flex items-center gap-1.5 text-mini text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-bold mb-1">
                   <Hash className="w-3 h-3" />
                   Generation
                 </div>
@@ -787,7 +787,7 @@ export function EquationEvolution() {
                 </div>
               </div>
               <div className="bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-white/8 p-3 rounded-lg">
-                <div className="flex items-center gap-1.5 text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-bold mb-1">
+                <div className="flex items-center gap-1.5 text-mini text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-bold mb-1">
                   <TrendingDown className="w-3 h-3" />
                   Mean Error
                 </div>
@@ -803,7 +803,7 @@ export function EquationEvolution() {
             {/* Fitness sparkline */}
             <div className="h-16 w-full bg-white dark:bg-neutral-900/80 border border-neutral-200 dark:border-white/8 rounded-lg p-2 relative overflow-hidden">
               {sparkline ?? (
-                <div className="w-full h-full flex items-center justify-center text-[10px] text-neutral-400 font-mono">
+                <div className="w-full h-full flex items-center justify-center text-mini text-neutral-400 font-mono">
                   Awaiting evolution…
                 </div>
               )}
@@ -826,7 +826,7 @@ export function EquationEvolution() {
 
             {/* Evolving badge */}
             {isEvolving && !isPaused && (
-              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-full px-3 py-1.5 text-[11px] font-bold text-white shadow-lg">
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-full px-3 py-1.5 text-tiny font-bold text-white shadow-lg">
                 <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                 Evolving…
               </div>
@@ -834,7 +834,7 @@ export function EquationEvolution() {
 
             {/* Paused badge */}
             {isEvolving && isPaused && (
-              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-amber-500/30 rounded-full px-3 py-1.5 text-[11px] font-bold text-amber-400 shadow-lg">
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-amber-500/30 rounded-full px-3 py-1.5 text-tiny font-bold text-amber-400 shadow-lg">
                 <Pause className="w-3 h-3" />
                 Paused
               </div>
@@ -842,7 +842,7 @@ export function EquationEvolution() {
 
             {/* Converged badge */}
             {converged && !isEvolving && (
-              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-emerald-500/30 rounded-full px-3 py-1.5 text-[11px] font-bold text-emerald-400 shadow-lg animate-in fade-in zoom-in duration-500">
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-emerald-500/30 rounded-full px-3 py-1.5 text-tiny font-bold text-emerald-400 shadow-lg animate-in fade-in zoom-in duration-500">
                 <Zap className="w-3 h-3" />
                 Converged!
               </div>
@@ -850,7 +850,7 @@ export function EquationEvolution() {
 
             {/* Adapting badge */}
             {isAdapting && !isPaused && !converged && (
-              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-violet-500/30 rounded-full px-3 py-1.5 text-[11px] font-bold text-violet-400 shadow-lg animate-in fade-in duration-300">
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-violet-500/30 rounded-full px-3 py-1.5 text-tiny font-bold text-violet-400 shadow-lg animate-in fade-in duration-300">
                 <Zap className="w-3 h-3 animate-pulse" />
                 Auto-Adapting...
               </div>
@@ -872,7 +872,7 @@ export function EquationEvolution() {
             <div className="absolute bottom-3 right-3 z-10 flex gap-2">
               <button
                 onClick={() => setIsExtrapolating(!isExtrapolating)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold backdrop-blur-md border transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-mini font-bold backdrop-blur-md border transition-all ${
                   isExtrapolating 
                     ? 'bg-violet-500/20 border-violet-500/50 text-violet-400'
                     : 'bg-black/60 border-white/10 text-neutral-400 hover:text-white'
@@ -889,7 +889,7 @@ export function EquationEvolution() {
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent dark:from-white/3 pointer-events-none rounded-xl" />
             <div className="relative z-10 space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[10px] text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-bold">
+                <div className="flex items-center gap-2 text-mini text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-bold">
                   <Dna className="w-3 h-3" />
                   Best Equation
                 </div>
@@ -897,7 +897,7 @@ export function EquationEvolution() {
                   <button
                     onClick={() => setShowHistory(true)}
                     disabled={historyMilestones.length === 0}
-                    className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors disabled:opacity-30 disabled:hover:text-neutral-500"
+                    className="flex items-center gap-1.5 px-2 py-1 rounded text-mini font-bold text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors disabled:opacity-30 disabled:hover:text-neutral-500"
                   >
                     <History className="w-3 h-3" />
                     Derivation History
@@ -905,7 +905,7 @@ export function EquationEvolution() {
                   <button
                     onClick={handleCopy}
                     disabled={!bestEquation}
-                    className="flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors disabled:opacity-30 disabled:hover:text-neutral-500"
+                    className="flex items-center gap-1.5 px-2 py-1 rounded text-mini font-bold text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors disabled:opacity-30 disabled:hover:text-neutral-500"
                   >
                     {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                     {copied ? 'Copied' : 'Copy'}
@@ -943,7 +943,7 @@ export function EquationEvolution() {
                   <div className="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">Final Simplification Steps</div>
                   {simplificationSteps.map((step, i) => (
                     <div key={`step-${i}`} className="flex flex-col gap-1 p-3 rounded bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/30">
-                      <div className="flex justify-between text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
+                      <div className="flex justify-between text-mini text-indigo-400 font-bold uppercase tracking-wider">
                         <span>Step {i + 1}</span>
                       </div>
                       <div className="font-bold text-violet-600 dark:text-cyan-300">
@@ -958,7 +958,7 @@ export function EquationEvolution() {
                 <div className="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-2">Evolution Milestones</div>
                 {historyMilestones.map((ms, i) => (
                   <div key={`ms-${i}`} className="flex flex-col gap-1 p-3 rounded bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
-                    <div className="flex justify-between text-[10px] text-neutral-500 font-bold uppercase tracking-wider">
+                    <div className="flex justify-between text-mini text-neutral-500 font-bold uppercase tracking-wider">
                       <span>Gen {ms.gen}</span>
                       <span>MSE: {formatMSE(ms.mse)}</span>
                     </div>

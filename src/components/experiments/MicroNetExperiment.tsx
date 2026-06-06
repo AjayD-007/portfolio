@@ -161,8 +161,8 @@ export function MicroNetExperiment() {
         const val = net.W1[i][j];
         if (Math.abs(val) >= threshold) {
           ctx.beginPath();
-          ctx.moveTo(inCenters[j].x, inCenters[j].y);
-          ctx.lineTo(hidCenters[i].x, hidCenters[i].y);
+          ctx.moveTo(inCenters[j]?.x, inCenters[j]?.y);
+          ctx.lineTo(hidCenters[i]?.x, hidCenters[i]?.y);
           const alpha = Math.min(1, Math.abs(val) * 3);
           
           if (isBackward) {
@@ -551,7 +551,7 @@ export function MicroNetExperiment() {
               {isTraining ? (
                 <button
                   onClick={stopTraining}
-                  className="col-span-2 flex items-center justify-center gap-2 bg-pink-500 text-white py-2 rounded text-xs font-bold hover:bg-pink-600 transition-all shadow-[0_0_15px_rgba(236,72,153,0.5)] border border-pink-500"
+                  className="col-span-2 flex items-center justify-center gap-2 bg-pink-500 text-white py-2 rounded text-xs font-bold hover:bg-pink-600 transition-all shadow-glow-pink border border-pink-500"
                 >
                   <Square className="w-3.5 h-3.5 fill-current" /> Stop Training
                 </button>
@@ -560,14 +560,14 @@ export function MicroNetExperiment() {
                   <button
                     onClick={runSlowMoStep}
                     disabled={!netRef.current || epoch >= 1000 || slowMoState.phase !== 'idle'}
-                    className={`col-span-1 flex items-center justify-center gap-1.5 bg-indigo-500 text-white py-2 rounded text-xs font-bold disabled:opacity-30 hover:bg-indigo-400 transition-all border border-indigo-400 ${epoch === 0 && slowMoState.phase === 'idle' ? 'shadow-[0_0_15px_rgba(99,102,241,0.5)]' : ''}`}
+                    className={`col-span-1 flex items-center justify-center gap-1.5 bg-indigo-500 text-white py-2 rounded text-xs font-bold disabled:opacity-30 hover:bg-indigo-400 transition-all border border-indigo-400 ${epoch === 0 && slowMoState.phase === 'idle' ? 'shadow-indigo-500/50 drop-shadow-md' : ''}`}
                   >
                     <Eye className="w-3.5 h-3.5" /> Step
                   </button>
                   <button
                     onClick={startTraining}
                     disabled={!netRef.current || epoch >= 1000 || slowMoState.phase !== 'idle'}
-                    className={`col-span-1 flex items-center justify-center gap-1.5 bg-cyan-500 text-black py-2 rounded text-xs font-bold disabled:opacity-30 hover:bg-cyan-400 transition-all border border-cyan-400 ${epoch === 0 && slowMoState.phase === 'idle' ? 'animate-pulse shadow-[0_0_20px_rgba(6,182,212,0.8)]' : 'shadow-[0_0_15px_rgba(6,182,212,0.5)]'}`}
+                    className={`col-span-1 flex items-center justify-center gap-1.5 bg-cyan-500 text-black py-2 rounded text-xs font-bold disabled:opacity-30 hover:bg-cyan-400 transition-all border border-cyan-400 ${epoch === 0 && slowMoState.phase === 'idle' ? 'animate-pulse shadow-glow-cyan' : 'shadow-glow-cyan'}`}
                   >
                     <Play className="w-3.5 h-3.5 fill-current" /> Auto-Train
                   </button>
@@ -606,7 +606,7 @@ export function MicroNetExperiment() {
                  <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-xs">2</span>
                  Interactive Playground
                </h2>
-               <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-cyan-500/30 rounded p-4 shadow-[0_0_30px_rgba(6,182,212,0.1)]">
+               <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-cyan-500/30 rounded p-4 shadow-glow-cyan-lg">
                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-3">
                    The network uses the last 3 characters you type to guess the next one.
                  </p>
@@ -618,7 +618,7 @@ export function MicroNetExperiment() {
                  />
                  
                  <div className="space-y-2 mb-4">
-                   <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
+                   <div className="text-mini font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
                      <span>Network sees:</span>
                      <span className="bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded text-black dark:text-white">
                         &quot;{sandboxText.slice(-3)}&quot;
@@ -668,7 +668,7 @@ export function MicroNetExperiment() {
           
           <div 
             ref={containerRef}
-            className={`flex-grow min-h-[500px] relative bg-neutral-50 dark:bg-[#0a0a0a] border ${slowMoState.phase === 'backward' ? 'border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.15)]' : 'border-neutral-300 dark:border-white/10 shadow-inner'} rounded-xl overflow-hidden p-6 flex justify-between items-stretch transition-all duration-300`}
+            className={`flex-grow min-h-[500px] relative border ${slowMoState.phase === 'backward' ? 'border-red-500/50 shadow-glow-red' : 'border-neutral-300 dark:border-white/10 shadow-inner'} rounded-xl overflow-hidden p-6 flex justify-between items-stretch transition-all duration-300`}
           >
             {/* SLOW MO OVERLAY */}
             {slowMoState.phase !== 'idle' && (
@@ -710,7 +710,7 @@ export function MicroNetExperiment() {
                   className="w-2.5 h-2.5 rounded-full bg-zinc-400 dark:bg-zinc-700 transition-all duration-300 ease-out shadow-sm mx-auto relative z-30"
                 />
               ))}
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
+              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
                 Input
               </div>
             </div>
@@ -724,7 +724,7 @@ export function MicroNetExperiment() {
                   className="w-2.5 h-2.5 rounded-full bg-zinc-400 dark:bg-zinc-700 transition-all duration-300 ease-out shadow-sm mx-auto relative z-30"
                 />
               ))}
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
+              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
                 Hidden
               </div>
             </div>
@@ -745,7 +745,7 @@ export function MicroNetExperiment() {
                   </div>
                 );
               })}
-              <div className="absolute -bottom-6 left-0 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
+              <div className="absolute -bottom-6 left-0 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
                 Output
               </div>
             </div>

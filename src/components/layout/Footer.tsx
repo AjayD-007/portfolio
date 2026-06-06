@@ -2,6 +2,8 @@
 
 import { resumeData } from "@/data/resume";
 import { usePathname } from "next/navigation";
+import { Container } from "@/components/layout/Container";
+import { Text } from "@/components/ui/Typography";
 
 export function Footer() {
   const pathname = usePathname();
@@ -11,8 +13,12 @@ export function Footer() {
   }
 
   return (
-    <footer className="w-full text-center py-8 text-sm text-gray-800 dark:text-gray-400 font-mono tracking-widest font-bold z-20 relative pointer-events-auto mt-auto">
-      &copy; {new Date().getFullYear()} {resumeData.title.toUpperCase()}
+    <footer className="w-full text-center py-8 z-20 relative pointer-events-auto mt-auto">
+      <Container maxWidth="4xl">
+        <Text variant="label" className="text-[var(--text-muted)]">
+          &copy; {new Date().getFullYear()} {resumeData.title}
+        </Text>
+      </Container>
     </footer>
   );
 }
