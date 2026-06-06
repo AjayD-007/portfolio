@@ -47,7 +47,7 @@ export default function GeodesicPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-[100dvh] bg-[#111] overflow-hidden touch-none z-50">
+    <div className="fixed inset-0 w-full h-dvh-full bg-surface-deep overflow-hidden touch-none z-50">
       {/* 
         We use a highly flattened Perspective projection via telephoto FOV logic. 
         Adjust camera limits in src/config/corridor.ts precisely instead of here. 

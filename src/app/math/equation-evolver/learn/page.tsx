@@ -42,7 +42,7 @@ export default function EquationEvolverLearnPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main className="min-h-screen pt-2 md:pt-4 pb-16 px-4 md:px-6 bg-white dark:bg-[#0a0a0a]">
+      <main className="min-h-screen pt-2 md:pt-4 pb-16 px-4 md:px-6 bg-surface dark:bg-surface-dark">
         <article className="container mx-auto max-w-3xl">
           <Link href="/math/equation-evolver" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white no-underline mb-8 transition-colors">
             <ArrowLeft size={16} /> Back to Evolver
