@@ -6,6 +6,7 @@ import * as THREE from "three";
 import Decimal from "decimal.js";
 import { Sidebar } from "./Sidebar";
 import { findBestReference, findBestReferenceFloat64 } from "./math";
+import { ExperimentLayout } from '@/components/layout/ExperimentLayout';
 
 const vertexShader = /* glsl */ `
   out vec2 vUv;
@@ -419,8 +420,21 @@ export function MandelbrotExplorer() {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black z-40 overflow-hidden">
-      <div ref={containerRef} className="absolute inset-0 cursor-crosshair touch-none">
+    <ExperimentLayout
+      sidebar={
+        <Sidebar
+          zoom={zoomUI}
+          maxIter={maxIter}    onMaxIter={v => { maxIterRef.current = v; setMaxIter(v); }}
+          colorA={colorA}      onColorA={v  => { colorARef.current  = v; setColorA(v);  }}
+          colorB={colorB}      onColorB={v  => { colorBRef.current  = v; setColorB(v);  }}
+          density={density}    onDensity={v => { densityRef.current = v; setDensity(v); }}
+          onReset={handleReset}
+          onDownload={handleDownload}
+          devData={devData}
+        />
+      }
+    >
+      <div ref={containerRef} className="absolute inset-0 cursor-crosshair touch-none bg-black">
         <Canvas
           orthographic
           camera={{ zoom: 1, position: [0, 0, 1], near: 0, far: 10 }}
@@ -430,17 +444,6 @@ export function MandelbrotExplorer() {
           <FractalScene refs={refs} downloadRef={downloadRef} debugDataRef={debugDataRef} />
         </Canvas>
       </div>
-      
-      <Sidebar
-        zoom={zoomUI}
-        maxIter={maxIter}    onMaxIter={v => { maxIterRef.current = v; setMaxIter(v); }}
-        colorA={colorA}      onColorA={v  => { colorARef.current  = v; setColorA(v);  }}
-        colorB={colorB}      onColorB={v  => { colorBRef.current  = v; setColorB(v);  }}
-        density={density}    onDensity={v => { densityRef.current = v; setDensity(v); }}
-        onReset={handleReset}
-        onDownload={handleDownload}
-        devData={devData}
-      />
 
       {isDownloading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -450,7 +453,7 @@ export function MandelbrotExplorer() {
           </div>
         </div>
       )}
-    </div>
+    </ExperimentLayout>
   );
 }
 

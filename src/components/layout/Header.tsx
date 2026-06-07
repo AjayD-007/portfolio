@@ -23,7 +23,7 @@ export function Header() {
       .catch((err) => console.error('Error fetching views:', err));
   }, []);
 
-  const isImmersivePage = pathname === '/math/non-euclidean-world' || pathname === '/math/fractals';
+  const isImmersivePage = pathname === '/math/non-euclidean-world' || pathname === '/math/fractals' || pathname === '/math/equation-evolver' || pathname === '/math/llm/micronet';
 
   const navLinks = [
     { name: "Home", href: "/" },

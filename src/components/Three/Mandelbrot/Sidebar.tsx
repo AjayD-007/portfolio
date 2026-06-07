@@ -1,6 +1,7 @@
 import React from "react";
 import Decimal from "decimal.js";
 import Link from "next/link";
+import { ExperimentSidebar } from "@/components/layout/ExperimentSidebar";
 
 export function Sidebar({
   zoom,
@@ -43,13 +44,13 @@ export function Sidebar({
   const [hideDebug, setHideDebug] = React.useState(false);
 
   return (
-    <div className="absolute top-24 md:top-32 right-4 md:right-8 w-64 max-h-content-area flex flex-col bg-white/10 dark:bg-black/60 backdrop-blur-2xl border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl text-black dark:text-white pointer-events-auto overflow-hidden">
+    <ExperimentSidebar variant="glass" title="Fractal Explorer" subtitle="Mandelbrot Set">
       <div className="px-5 py-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-white/40 dark:bg-white/5 shrink-0">
         <div>
           <p className="text-mini font-bold uppercase tracking-[0.2em] text-black/50 dark:text-white/50 mb-1">
             Fractal Explorer
           </p>
-          <p className="font-mono text-sm font-semibold">{zoomStr}</p>
+          <p className="font-mono text-sm font-semibold text-black dark:text-white">{zoomStr}</p>
         </div>
         <div
           className={`text-micro px-2 py-1 rounded-full flex items-center gap-1.5 font-semibold tracking-wide ${
@@ -175,6 +176,6 @@ export function Sidebar({
           </button>
         </div>
       </div>
-    </div>
+    </ExperimentSidebar>
   );
 }
