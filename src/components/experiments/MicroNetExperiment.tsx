@@ -1,8 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Square, Loader2, RefreshCw, Wand2, Eye } from 'lucide-react';
+import { Play, Square, Loader2, RefreshCw, Wand2, Eye, X } from 'lucide-react';
+import { Card } from '@/components/ui/Card';
+import { Heading, Text } from '@/components/ui/Typography';
+import { Button } from '@/components/ui/Button';
+import { useRouter } from 'next/navigation';
 import { MicroNet } from '@/lib/microNet';
+import { ExperimentLayout } from '@/components/layout/ExperimentLayout';
+import { ExperimentSidebar } from '@/components/layout/ExperimentSidebar';
 
 const DEFAULT_TEXT = "Any sufficiently advanced technology is indistinguishable from magic.";
 
@@ -19,6 +25,7 @@ export function MicroNetExperiment() {
   
   const [networkStats, setNetworkStats] = useState({ vocab: 0, input: 0, hidden: 0, output: 0 });
 
+  const router = useRouter();
   const [slowMoState, setSlowMoState] = useState<{
     phase: 'idle' | 'forward' | 'loss' | 'backward',
     context: string,
@@ -168,7 +175,7 @@ export function MicroNetExperiment() {
           if (isBackward) {
              ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`; // Red pulse for backprop
           } else {
-             ctx.strokeStyle = val > 0 ? `rgba(6, 182, 212, ${alpha})` : `rgba(236, 72, 153, ${alpha})`;
+             ctx.strokeStyle = val > 0 ? `rgba(6, 182, 212, ${alpha})` : `rgba(217, 70, 239, ${alpha})`;
           }
           ctx.stroke();
         }
@@ -181,13 +188,13 @@ export function MicroNetExperiment() {
         const val = net.W2[i][j];
         if (Math.abs(val) >= threshold) {
           ctx.beginPath();
-          ctx.moveTo(hidCenters[j].x, hidCenters[j].y);
-          ctx.lineTo(outCenters[i].x, outCenters[i].y);
+          ctx.moveTo(hidCenters[j]?.x, hidCenters[j]?.y);
+          ctx.lineTo(outCenters[i]?.x, outCenters[i]?.y);
           const alpha = Math.min(1, Math.abs(val) * 3);
           if (isBackward) {
              ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
           } else {
-             ctx.strokeStyle = val > 0 ? `rgba(6, 182, 212, ${alpha})` : `rgba(236, 72, 153, ${alpha})`;
+             ctx.strokeStyle = val > 0 ? `rgba(6, 182, 212, ${alpha})` : `rgba(217, 70, 239, ${alpha})`;
           }
           ctx.stroke();
         }
@@ -216,7 +223,7 @@ export function MicroNetExperiment() {
       const node = inputNodesRef.current[i];
       if (node) {
         if (x[i] > 0) {
-          node.style.backgroundColor = '#22d3ee'; // cyan-400
+          node.style.backgroundColor = '#06b6d4'; // cyan-400
           node.style.boxShadow = '0 0 10px #22d3ee, 0 0 20px #22d3ee';
           node.style.opacity = '1';
           node.style.transform = 'scale(1.5)';
@@ -234,7 +241,7 @@ export function MicroNetExperiment() {
       if (node) {
         if (a1[i] > 0) {
           const intensity = Math.min(1, a1[i] * 5);
-          node.style.backgroundColor = '#c084fc'; // purple-400
+          node.style.backgroundColor = '#d946ef'; // purple-400
           node.style.boxShadow = `0 0 ${intensity * 15}px #c084fc`;
           node.style.opacity = Math.max(0.3, intensity).toString();
           node.style.transform = `scale(${1 + intensity * 0.5})`;
@@ -509,208 +516,210 @@ export function MicroNetExperiment() {
     }).join(' ');
 
     return (
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full text-cyan-500/30">
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full text-accent-primary/30">
         <line x1="0" y1={height / 2} x2={width} y2={height / 2} stroke="currentColor" strokeDasharray="3,3" strokeWidth="0.75" />
         <polyline
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
           points={points}
-          className="text-cyan-400 drop-shadow-md"
+          className="text-accent-primary/400 drop-shadow-md"
         />
       </svg>
     );
   };
 
   return (
-    <div className="w-full space-y-8 pb-12 text-black dark:text-white">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Side: Controls & Metrics */}
-        <div className="lg:col-span-4 space-y-6">
+    <ExperimentLayout
+      sidebar={
+        <ExperimentSidebar title="MicroNet" subtitle="Architecture" variant="standard">
           <div className="space-y-4">
-            <h2 className="text-base font-extrabold uppercase tracking-wider border-b-2 border-neutral-300 dark:border-white/20 pb-2 flex items-center gap-2">
+            <Text variant="label" className="border-b-2 border-neutral-300 dark:border-white/20 pb-2 flex items-center gap-2">
               <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-xs">1</span>
               Corpus & Configuration
-            </h2>
+            </Text>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
               disabled={isTraining || slowMoState.phase !== 'idle'}
-              className="w-full h-32 p-3 text-sm rounded bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-white/20 placeholder:text-neutral-500 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 disabled:opacity-50 resize-none font-mono shadow-sm transition-colors"
+              className="w-full h-32 p-3 text-sm rounded bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-white/20 placeholder:text-neutral-500 focus:outline-none focus:border-accent-primary dark:focus:border-accent-primary disabled:opacity-50 resize-none font-mono shadow-sm transition-colors"
             />
             <div className="grid grid-cols-3 gap-2">
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={initNetwork}
                 disabled={isTraining || slowMoState.phase !== 'idle' || !text.trim()}
-                className="col-span-1 flex items-center justify-center gap-2 bg-neutral-200 dark:bg-white/10 text-black dark:text-white py-2 rounded text-xs font-bold hover:bg-neutral-300 dark:hover:bg-white/20 transition-all border border-neutral-300 dark:border-white/20"
+                className="flex items-center justify-center gap-1.5"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Rebuild
-              </button>
-              
-              {isTraining ? (
-                <button
-                  onClick={stopTraining}
-                  className="col-span-2 flex items-center justify-center gap-2 bg-pink-500 text-white py-2 rounded text-xs font-bold hover:bg-pink-600 transition-all shadow-glow-pink border border-pink-500"
-                >
-                  <Square className="w-3.5 h-3.5 fill-current" /> Stop Training
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={runSlowMoStep}
-                    disabled={!netRef.current || epoch >= 1000 || slowMoState.phase !== 'idle'}
-                    className={`col-span-1 flex items-center justify-center gap-1.5 bg-indigo-500 text-white py-2 rounded text-xs font-bold disabled:opacity-30 hover:bg-indigo-400 transition-all border border-indigo-400 ${epoch === 0 && slowMoState.phase === 'idle' ? 'shadow-indigo-500/50 drop-shadow-md' : ''}`}
-                  >
-                    <Eye className="w-3.5 h-3.5" /> Step
-                  </button>
-                  <button
-                    onClick={startTraining}
-                    disabled={!netRef.current || epoch >= 1000 || slowMoState.phase !== 'idle'}
-                    className={`col-span-1 flex items-center justify-center gap-1.5 bg-cyan-500 text-black py-2 rounded text-xs font-bold disabled:opacity-30 hover:bg-cyan-400 transition-all border border-cyan-400 ${epoch === 0 && slowMoState.phase === 'idle' ? 'animate-pulse shadow-glow-cyan' : 'shadow-glow-cyan'}`}
-                  >
-                    <Play className="w-3.5 h-3.5 fill-current" /> Auto-Train
-                  </button>
-                </>
-              )}
+                <RefreshCw className="w-4 h-4" /> Reset
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={startTraining}
+                disabled={isTraining || slowMoState.phase !== 'idle' || !netRef.current || text.trim() === ""}
+                className="col-span-2 flex items-center justify-center gap-1.5"
+              >
+                {isTraining ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Training (Epoch {epoch})</>
+                ) : (
+                  <><Play className="w-4 h-4" /> Fast Train</>
+                )}
+              </Button>
             </div>
+            <Button
+                variant="ghost"
+                size="sm"
+                onClick={runSlowMoStep}
+                disabled={isTraining || slowMoState.phase !== 'idle' || !netRef.current || text.trim() === ""}
+                className="w-full flex items-center justify-center gap-1.5 border border-dashed border-neutral-300 dark:border-white/20"
+              >
+                {slowMoState.phase !== 'idle' ? (
+                  <><Square className="w-4 h-4" /> Stop Slow-Mo</>
+                ) : (
+                  <><Eye className="w-4 h-4" /> Slow-Mo Visual Training</>
+                )}
+            </Button>
           </div>
 
-          <div className="space-y-4 pt-4">
-            <h2 className="text-base font-extrabold uppercase tracking-wider border-b-2 border-neutral-300 dark:border-white/20 pb-2">
-              Live Metrics
-            </h2>
-            <div className="grid grid-cols-2 gap-4 text-xs font-mono">
-              <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 p-3 rounded">
-                <div className="text-neutral-500 dark:text-neutral-400 mb-1">Epoch</div>
-                <div className="text-xl font-black text-cyan-600 dark:text-cyan-400">{epoch}</div>
-              </div>
-              <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 p-3 rounded">
-                <div className="text-neutral-500 dark:text-neutral-400 mb-1">Loss</div>
-                <div className="text-xl font-black text-pink-600 dark:text-pink-400">{loss === 0 ? "0.000" : loss.toFixed(4)}</div>
-              </div>
-            </div>
-            
-            <div className="h-24 w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/10 rounded p-2 relative shadow-sm">
-               {lossHistory.length >= 2 ? renderGraph() : (
-                 <div className="w-full h-full flex items-center justify-center text-xs text-neutral-400">
-                    Awaiting data...
+          {(hasTrained || isTraining) && (
+            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <Text variant="label" className="border-b-2 border-neutral-300 dark:border-white/20 pb-2 flex items-center gap-2">
+                  <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-xs">2</span>
+                  Training Metrics
+               </Text>
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="p-3 bg-neutral-100 dark:bg-white/5 rounded-lg border border-neutral-200 dark:border-white/10 shadow-inner text-center">
+                    <Text variant="muted" className="!text-[10px] !mb-1">Current Epoch</Text>
+                    <div className="font-mono text-xl font-bold text-accent-primary">{epoch}</div>
                  </div>
-               )}
+                 <div className="p-3 bg-neutral-100 dark:bg-white/5 rounded-lg border border-neutral-200 dark:border-white/10 shadow-inner text-center">
+                    <Text variant="muted" className="!text-[10px] !mb-1">Cross-Entropy Loss</Text>
+                    <div className="font-mono text-xl font-bold text-red-500">{loss.toFixed(4)}</div>
+                 </div>
+               </div>
+               
+               <div className="h-24 w-full bg-neutral-100 dark:bg-white/5 rounded-lg border border-neutral-200 dark:border-white/10 p-2 shadow-inner relative overflow-hidden flex flex-col">
+                  <Text variant="muted" className="!text-[9px] absolute top-2 left-3 !mb-0 z-10">Loss Curve</Text>
+                  <div className="flex-1 mt-4">
+                     {renderGraph()}
+                  </div>
+               </div>
             </div>
-          </div>
-          
-          {hasTrained && slowMoState.phase === 'idle' && (
-             <div className="space-y-4 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-               <h2 className="text-base font-extrabold uppercase tracking-wider border-b-2 border-neutral-300 dark:border-white/20 pb-2 flex items-center gap-2">
-                 <span className="bg-black dark:bg-white text-white dark:text-black w-5 h-5 rounded flex items-center justify-center text-xs">2</span>
-                 Interactive Playground
-               </h2>
-               <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-cyan-500/30 rounded p-4 shadow-glow-cyan-lg">
-                 <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-3">
-                   The network uses the last 3 characters you type to guess the next one.
-                 </p>
-                 <textarea
-                   value={sandboxText}
-                   onChange={e => setSandboxText(e.target.value)}
-                   placeholder="Type a few characters..."
-                   className="w-full h-20 p-3 text-lg rounded bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-white/10 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 resize-none font-mono shadow-inner mb-4"
-                 />
+          )}
+
+          {hasTrained && !isTraining && slowMoState.phase === 'idle' && (
+             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
+               <Text variant="label" className="border-b-2 border-neutral-300 dark:border-white/20 pb-2 flex items-center gap-2 text-accent-secondary">
+                  <span className="bg-accent-secondary text-white w-5 h-5 rounded flex items-center justify-center text-xs font-bold">3</span>
+                  Inference Playground
+               </Text>
+               <div className="p-4 bg-white dark:bg-neutral-900 border border-accent-secondary/30 rounded-xl shadow-[var(--shadow-glow-blue)] space-y-4 relative overflow-hidden">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent-secondary/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                  
-                 <div className="space-y-2 mb-4">
-                   <div className="text-mini font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
-                     <span>Network sees:</span>
-                     <span className="bg-neutral-200 dark:bg-neutral-800 px-1.5 py-0.5 rounded text-black dark:text-white">
-                        &quot;{sandboxText.slice(-3)}&quot;
-                     </span>
-                     <span>➔ Predicts:</span>
+                 <div>
+                   <Text variant="muted" className="!text-[10px] !mb-1">Context Window (Last 3 chars)</Text>
+                   <div className="w-full p-3 font-mono text-lg font-bold bg-neutral-100 dark:bg-black rounded-lg border border-neutral-200 dark:border-white/10 text-center tracking-[0.3em] overflow-x-auto whitespace-nowrap">
+                      {sandboxText.slice(-3) || " "}
                    </div>
-                   {top5Probs.map((item, i) => (
-                     <div key={i} className="flex items-center gap-3 text-xs font-mono">
-                       <span className="w-6 text-center font-bold bg-neutral-100 dark:bg-neutral-800 rounded py-0.5">{item.char === ' ' ? '␣' : item.char}</span>
-                       <div className="flex-grow h-1.5 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
-                         <div className="h-full bg-cyan-500 transition-all duration-200" style={{ width: `${item.prob * 100}%` }} />
-                       </div>
-                       <span className="w-10 text-right font-bold text-neutral-600 dark:text-neutral-400">{(item.prob * 100).toFixed(1)}%</span>
-                     </div>
-                   ))}
                  </div>
-                 
-                 <div className="flex gap-2">
-                   <button
+
+                 <div className="space-y-2">
+                   <div className="flex justify-between items-end">
+                      <Text variant="muted" className="!text-[10px] !mb-0">Network Probabilities</Text>
+                   </div>
+                   <div className="space-y-1.5">
+                     {top5Probs.map((p, i) => (
+                       <div key={i} className="flex items-center gap-2 text-xs font-mono">
+                         <div className="w-6 text-center font-bold text-accent-secondary">
+                           {p.char === ' ' ? '␣' : p.char}
+                         </div>
+                         <div className="flex-1 h-3 bg-neutral-100 dark:bg-white/10 rounded-full overflow-hidden">
+                           <div 
+                             className={`h-full rounded-full transition-all duration-300 ${i === 0 ? 'bg-accent-secondary' : 'bg-neutral-400 dark:bg-neutral-600'}`} 
+                             style={{ width: `${p.prob * 100}%` }}
+                           />
+                         </div>
+                         <div className="w-10 text-right text-[10px] text-neutral-500">
+                           {(p.prob * 100).toFixed(0)}%
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+
+                 <div className="flex gap-2 pt-2 border-t border-neutral-200 dark:border-white/10">
+                   <Button
+                     variant="ghost"
+                     size="sm"
                      onClick={seedPlayground}
-                     className="flex-1 flex items-center justify-center gap-2 bg-neutral-100 dark:bg-white/5 text-neutral-700 dark:text-neutral-300 py-2 rounded text-xs font-bold hover:bg-neutral-200 dark:hover:bg-white/10 transition-all border border-neutral-200 dark:border-white/10"
+                     className="flex-1 flex items-center justify-center gap-2 text-xs"
                    >
                      Pick Random Seed
-                   </button>
-                   <button
+                   </Button>
+                   <Button
+                     variant="primary"
+                     size="sm"
                      onClick={generateNext}
-                     className="flex-[2] flex items-center justify-center gap-2 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 py-2 rounded text-xs font-bold hover:bg-cyan-500/20 transition-all border border-cyan-500/30"
+                     className="flex-[2] flex items-center justify-center gap-2 text-xs"
                    >
                      <Wand2 className="w-3.5 h-3.5" /> Auto-Generate
-                   </button>
+                   </Button>
                  </div>
                </div>
              </div>
           )}
-        </div>
-
-        {/* Right Side: Network Visualization */}
-        <div className="lg:col-span-8 flex flex-col relative">
-          <h2 className="text-base font-extrabold uppercase tracking-wider mb-4 flex items-center justify-between">
-            <span>Glass-Box Architecture</span>
-            {isTraining && (
-               <span className="flex items-center gap-2 text-xs text-cyan-500 animate-pulse font-bold">
-                 <Loader2 className="w-3.5 h-3.5 animate-spin" /> Training Model
-               </span>
-            )}
-          </h2>
-          
-          <div 
-            ref={containerRef}
-            className={`flex-grow min-h-[500px] relative border ${slowMoState.phase === 'backward' ? 'border-red-500/50 shadow-glow-red' : 'border-neutral-300 dark:border-white/10 shadow-inner'} rounded-xl overflow-hidden p-6 flex justify-between items-stretch transition-all duration-300`}
-          >
-            {/* SLOW MO OVERLAY */}
-            {slowMoState.phase !== 'idle' && (
-               <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 animate-in slide-in-from-top-4">
-                 <div className="bg-black/80 backdrop-blur-md text-white border border-white/20 rounded-full px-6 py-2 text-sm font-bold shadow-2xl flex items-center gap-3">
-                   {slowMoState.phase === 'forward' && (
-                     <>
-                        <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"/>
-                        Forward Pass: Guessing next char for &quot;{slowMoState.context}&quot;
-                     </>
-                   )}
-                   {slowMoState.phase === 'loss' && (
-                     <>
-                        <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"/>
-                        Network guessed &quot;{slowMoState.prediction}&quot;, but answer is &quot;{slowMoState.target}&quot;
-                     </>
-                   )}
-                   {slowMoState.phase === 'backward' && (
-                     <>
-                        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"/>
-                        Backpropagation: Adjusting weights to minimize loss
-                     </>
-                   )}
-                 </div>
-               </div>
-            )}
-            
-            <canvas 
-              ref={canvasRef} 
-              className="absolute inset-0 pointer-events-none z-10 opacity-90 transition-opacity duration-300"
-            />
-            
+        </ExperimentSidebar>
+      }
+    >
+      {/* Fullscreen Canvas Container */}
+      <div 
+        ref={containerRef}
+        className={`absolute inset-0 transition-all duration-300 ${slowMoState.phase === 'backward' ? 'border-red-500/50 shadow-[var(--shadow-glow-red)]' : ''}`}
+      >
+        {/* SLOW MO OVERLAY */}
+        {slowMoState.phase !== 'idle' && (
+           <div className="absolute top-24 md:top-32 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 animate-in slide-in-from-top-4">
+             <div className="bg-[var(--bg-surface-elevated)] backdrop-blur-md text-[var(--text-main)] border border-[var(--border-main)] rounded-full px-6 py-2 text-sm font-bold shadow-2xl flex items-center gap-3">
+               {slowMoState.phase === 'forward' && (
+                 <>
+                    <div className="w-2 h-2 rounded-full bg-accent-primary animate-pulse"/>
+                    Forward Pass: Guessing next char for &quot;{slowMoState.context}&quot;
+                 </>
+               )}
+               {slowMoState.phase === 'loss' && (
+                 <>
+                    <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"/>
+                    Network guessed &quot;{slowMoState.prediction}&quot;, but answer is &quot;{slowMoState.target}&quot;
+                 </>
+               )}
+               {slowMoState.phase === 'backward' && (
+                 <>
+                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"/>
+                    Backpropagation: Adjusting weights to minimize loss
+                 </>
+               )}
+             </div>
+           </div>
+        )}
+        
+        <canvas 
+          ref={canvasRef} 
+          className="absolute inset-0 pointer-events-none z-10 opacity-90 transition-opacity duration-300"
+        />
+        
+        <div className="absolute inset-0 flex items-center justify-evenly pointer-events-none pb-20 md:pr-80">
             {/* Input Layer */}
             <div className="relative z-20 flex flex-col justify-center gap-1.5 w-8">
               {Array.from({ length: networkStats.input }).map((_, i) => (
                 <div 
                   key={`in-${i}`}
                   ref={el => { inputNodesRef.current[i] = el; }}
-                  className="w-2.5 h-2.5 rounded-full bg-zinc-400 dark:bg-zinc-700 transition-all duration-300 ease-out shadow-sm mx-auto relative z-30"
+                  className="w-3 h-3 rounded-full bg-zinc-400 dark:bg-zinc-700 transition-all duration-300 ease-out shadow-sm mx-auto relative z-30"
                 />
               ))}
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
                 Input
               </div>
             </div>
@@ -721,10 +730,10 @@ export function MicroNetExperiment() {
                 <div 
                   key={`hid-${i}`}
                   ref={el => { hiddenNodesRef.current[i] = el; }}
-                  className="w-2.5 h-2.5 rounded-full bg-zinc-400 dark:bg-zinc-700 transition-all duration-300 ease-out shadow-sm mx-auto relative z-30"
+                  className="w-3 h-3 rounded-full bg-zinc-400 dark:bg-zinc-700 transition-all duration-300 ease-out shadow-sm mx-auto relative z-30"
                 />
               ))}
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
                 Hidden
               </div>
             </div>
@@ -737,23 +746,20 @@ export function MicroNetExperiment() {
                   <div key={`out-${i}`} className="flex items-center gap-2 group">
                     <div 
                       ref={el => { outputNodesRef.current[i] = el; }}
-                      className="w-3.5 h-3.5 rounded-full bg-zinc-400 dark:bg-zinc-700 transition-all duration-300 ease-out shadow-sm shrink-0 relative z-30"
+                      className="w-4 h-4 rounded-full bg-zinc-400 dark:bg-zinc-700 transition-all duration-300 ease-out shadow-sm shrink-0 relative z-30"
                     />
-                    <span className="font-mono text-xs font-bold text-neutral-400 group-hover:text-cyan-400 transition-colors">
+                    <span className="font-mono text-xs font-bold text-[var(--text-muted)] group-hover:text-accent-primary transition-colors">
                       {char === ' ' ? '␣' : char}
                     </span>
                   </div>
                 );
               })}
-              <div className="absolute -bottom-6 left-0 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
+              <div className="absolute -bottom-8 left-0 text-mini font-bold uppercase tracking-wider whitespace-nowrap text-neutral-500">
                 Output
               </div>
             </div>
-
-          </div>
         </div>
-
       </div>
-    </div>
+    </ExperimentLayout>
   );
 }
