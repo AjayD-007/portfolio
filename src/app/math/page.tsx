@@ -83,7 +83,7 @@ export default function MathHubPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Container maxWidth="7xl" className="min-h-screen pt-2 md:pt-4 pb-8 md:pb-16 flex-grow">
+      <Container maxWidth="7xl" >
         <Section spacing="none" className="mb-10 md:mb-16">
           <Heading level={1} variant="section">
             Experiments

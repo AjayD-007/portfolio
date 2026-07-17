@@ -22,7 +22,7 @@ export const Container = ({ children, className = "", maxWidth = "4xl", ...props
 
   return (
     <div 
-      className={`mega-container ${className}`} 
+      className={`mega-container pt-4 md:pt-6 ${className}`} 
       style={{ '--container-max-w': maxWMap[maxWidth] } as React.CSSProperties}
       {...props}
     >

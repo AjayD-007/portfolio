@@ -1,0 +1,24 @@
+[
+  {
+    "title": "Inception",
+    "director": "Christopher Nolan",
+    "type": "Movie",
+    "genre": "Sci-Fi / Thriller",
+    "rating": 5,
+    "review": "A masterclass in layered storytelling, pacing, and visual effects. The dream architecture structure fits perfectly with complex mental logic.",
+    "coverImageUrl": "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
+    "externalLink": "https://www.imdb.com/title/tt1375666/",
+    "dateCompleted": "2026-05-20"
+  },
+  {
+    "title": "Breaking Bad",
+    "director": "Vince Gilligan",
+    "type": "Series",
+    "genre": "Crime / Drama",
+    "rating": 5,
+    "review": "Incredible character arcs and tension management. Shows how individual choices snowball out of control, maintaining absolute agency over the narrative.",
+    "coverImageUrl": "https://m.media-amazon.com/images/M/MV5BMjhiMzgxZTctNDc1Ni00OTUxLTkwNTUtMWExQjE2NzMxNTk3XkEyXkFqcGdeQXVyMTAwMzM3NDc3._V1_SX300.jpg",
+    "externalLink": "https://www.imdb.com/title/tt0903747/",
+    "dateCompleted": "2026-04-12"
+  }
+]
