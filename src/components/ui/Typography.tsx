@@ -43,7 +43,7 @@ export const Text = ({ variant = "body", className = "", children, ...props }: T
     "muted": "text-base md:text-lg text-[var(--text-muted)] font-medium leading-relaxed",
     "card-subtitle": "text-base md:text-lg text-[var(--text-muted)] font-medium leading-relaxed mt-1 md:mt-2",
     "hero-subtitle": "text-lg md:text-xl lg:text-2xl text-[var(--text-muted)] font-semibold mb-6 capitalize text-center md:text-left w-full",
-    "label": "text-sm md:text-base font-mono font-bold tracking-widest uppercase",
+    "label": "text-[10px] sm:text-xs md:text-sm font-mono font-bold tracking-widest uppercase",
   };
 
   return (

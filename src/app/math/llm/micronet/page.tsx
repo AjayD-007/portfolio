@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function MicroNetPage() {
   return (
-    <Container maxWidth="7xl" className="min-h-screen pt-4 pb-16 flex-grow">
+    <Container maxWidth="7xl">
       <div className="mb-8">
         <Link 
           href="/math" 

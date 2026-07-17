@@ -31,7 +31,7 @@ export default async function BlogsPage() {
   const blogs = await getPosts();
 
   return (
-    <Container maxWidth="7xl" className="py-4 md:py-8 z-10 flex-grow">
+    <Container maxWidth="7xl">
       <Section spacing="none" className="mb-16">
         <Heading level={1} variant="section">
           Writings
