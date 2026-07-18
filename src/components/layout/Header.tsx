@@ -32,7 +32,7 @@ export function Header() {
   ];
 
   return (
-    <header className={`w-full z-50 pt-6 pointer-events-auto ${isImmersivePage ? 'fixed top-0 left-0' : 'relative'}`}>
+    <header className={`w-full z-50 pointer-events-auto ${isImmersivePage ? 'fixed top-0 left-0' : 'relative'}`}>
       <Container maxWidth="7xl">
         <Card variant="nav">
           <div className="flex items-center gap-4 md:gap-8">
