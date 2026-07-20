@@ -7,7 +7,9 @@
     "review": "Read this fully to help clear my mind before bed. The writing style is simple, but the 'Glad Game' mechanic can border on toxic positivity if you aren't in the right mindset.",
     "coverImageUrl": "https://www.gutenberg.org/cache/epub/1450/pg1450.cover.medium.jpg",
     "externalLink": "https://play.google.com/books/reader?id=uiVpPAAAAEAJ",
-    "dateCompleted": "2026-07-15"
+    "dateCompleted": "2026-07-15",
+    "language": "English",
+    "length": "Full"
   },
   {
     "title": "Animal Farm",
@@ -17,7 +19,9 @@
     "review": "Brilliantly direct and written in incredibly clean, simple English. The only downside is the intense feeling of hopelessness and the grim ending.",
     "coverImageUrl": "https://www.gutenberg.org/cache/epub/72000/pg72000.cover.medium.jpg",
     "externalLink": "https://play.google.com/books/reader?id=C6y5OwAAAEAJ",
-    "dateCompleted": "2026-06-10"
+    "dateCompleted": "2026-06-10",
+    "language": "English",
+    "length": "Full"
   },
   {
     "title": "Kilisal (கிழிசல்)",
@@ -27,6 +31,8 @@
     "review": "A masterful example of simple Tamil realism. Captures the innocent perspective of a child turning a rainwater downpour into his own personal waterfall to handle a difficult situation with immense dignity.",
     "coverImageUrl": "",
     "externalLink": "https://sirukathaigal.com/",
-    "dateCompleted": "2026-07-17"
+    "dateCompleted": "2026-07-17",
+    "language": "Tamil",
+    "length": "Short"
   }
 ]
