@@ -1,5 +1,5 @@
 import { resumeData } from "@/data/resume";
-import { HeroAvatarCanvas } from "@/components/Three/HeroAvatar";
+import HeroAvatarWrapper from "@/components/Three/HeroAvatarWrapper";
 import { Section } from "@/components/layout/Section";
 import { Heading, Text, GradientText } from "@/components/ui/Typography";
 import { SplitLayout } from "@/components/layout/SplitLayout";
@@ -25,7 +25,7 @@ export const HeroSection = () => {
         }
         right={
           <div className="container-experiment aspect-[3/4] w-full">
-            <HeroAvatarCanvas />
+            <HeroAvatarWrapper />
           </div>
         }
       />

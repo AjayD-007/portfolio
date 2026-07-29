@@ -1,8 +1,13 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer, ContactShadows, Stars } from "@react-three/drei";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
+const Environment = dynamic(() => import('@react-three/drei').then(mod => mod.Environment), { ssr: false });
+const Lightformer = dynamic(() => import('@react-three/drei').then(mod => mod.Lightformer), { ssr: false });
+const ContactShadows = dynamic(() => import('@react-three/drei').then(mod => mod.ContactShadows), { ssr: false });
+const Stars = dynamic(() => import('@react-three/drei').then(mod => mod.Stars), { ssr: false });
+import dynamic from 'next/dynamic';
+const EffectComposer = dynamic(() => import('@react-three/postprocessing').then(mod => mod.EffectComposer), { ssr: false });
+const Bloom = dynamic(() => import('@react-three/postprocessing').then(mod => mod.Bloom), { ssr: false });
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 import { useRef, useMemo, useEffect, useState, Suspense } from "react";

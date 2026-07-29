@@ -15,7 +15,7 @@ export function Footer() {
   return (
     <footer className="w-full text-center py-8 z-20 relative pointer-events-auto mt-auto">
       <Container maxWidth="4xl">
-        <Text variant="label" className="text-[var(--text-muted)]">
+        <Text variant="label" className="text-[var(--text-main)]">
           &copy; {new Date().getFullYear()} {resumeData.title}
         </Text>
       </Container>

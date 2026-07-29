@@ -12,7 +12,7 @@ export const CardHeader = ({ title, subtitle, badges }: CardHeaderProps) => {
   return (
     <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 md:mb-6 w-full">
       <div className="flex flex-col items-start">
-        <Heading level={4} variant="card-subtitle">{title}</Heading>
+        <Heading level={3} variant="card-subtitle">{title}</Heading>
         <Text variant="muted">{subtitle}</Text>
       </div>
       {badges && (

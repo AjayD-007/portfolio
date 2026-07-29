@@ -1,5 +1,5 @@
 import { resumeData } from "@/data/resume";
-import Scene from "@/components/Three/Scene";
+import SceneWrapper from "@/components/Three/SceneWrapper";
 import { Container } from "@/components/layout/Container";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { AboutSection } from "@/components/sections/AboutSection";
@@ -27,7 +27,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Scene />
+      <SceneWrapper />
       
       {/* Mega Container Wrapper (Automatically constrains children to max-w-4xl and centers them) */}
       <Container maxWidth="5xl" className="pb-12 md:pb-24">
