@@ -6,29 +6,15 @@ import { Section } from "@/components/layout/Section";
 import { Heading, Text } from "@/components/ui/Typography";
 import { Grid } from "@/components/layout/Grid";
 import { Badge } from "@/components/ui/Badge";
+import { getDevToArticles } from "@/lib/devto";
 
 export const metadata: Metadata = {
   title: "Writings | Ajay - Frontend & Design",
   description: "Thoughts, tutorials, and experiments exploring frontend engineering and design.",
 };
 
-const DEV_TO_USERNAME = "ajay_dharmaraj";
-
-export const revalidate = 3600;
-
-async function getPosts() {
-  try {
-    const res = await fetch(`https://dev.to/api/articles?username=${DEV_TO_USERNAME}&state=all`);
-    if (!res.ok) return [];
-    return await res.json();
-  } catch (error) {
-    console.error("Error fetching Dev.to articles:", error);
-    return [];
-  }
-}
-
 export default async function BlogsPage() {
-  const blogs = await getPosts();
+  const blogs = await getDevToArticles();
 
   return (
     <Container maxWidth="7xl">
@@ -42,7 +28,7 @@ export default async function BlogsPage() {
       </Section>
 
       {blogs.length === 0 ? (
-        <Text variant="muted">No articles found for @{DEV_TO_USERNAME} yet...</Text>
+        <Text variant="muted">No articles found yet...</Text>
       ) : (
         <Grid columns={3}>
           {blogs.map((blog: any, i: number) => (

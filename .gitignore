@@ -43,3 +43,7 @@ next-env.d.ts
 # scraped media
 /public/epubs/
 /public/media/
+
+# serwist service worker (generated at build time)
+/public/sw.js
+/public/swe-worker-*.js
