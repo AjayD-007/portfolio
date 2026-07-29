@@ -4,38 +4,22 @@ import { Card } from "@/components/ui/Card";
 import { Metadata, ResolvingMetadata } from "next";
 import { Container } from "@/components/layout/Container";
 import { Heading, Text } from "@/components/ui/Typography";
-
-const DEV_TO_USERNAME = "ajay_dharmaraj";
-
-export const revalidate = 3600; // ISR cache revalidation
+import { getDevToArticle, getDevToArticles } from "@/lib/devto";
 
 // Static Site Generation setup
 export async function generateStaticParams() {
-  const res = await fetch(`https://dev.to/api/articles?username=${DEV_TO_USERNAME}`);
-  if (!res.ok) return [];
-  const posts = await res.json();
-
+  const posts = await getDevToArticles();
   return posts.map((post: any) => ({
     slug: post.slug,
   }));
 }
 
-async function getArticle(slug: string) {
-  try {
-    const res = await fetch(`https://dev.to/api/articles/${DEV_TO_USERNAME}/${slug}`);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (error) {
-    return null;
-  }
-}
-
 export async function generateMetadata(
-  { params }: { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string }> },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const parsedParams = await params;
-  const article = await getArticle(parsedParams.slug);
+  const article = await getDevToArticle(parsedParams.slug);
 
   if (!article) return { title: 'Not Found' };
 
@@ -63,9 +47,9 @@ export async function generateMetadata(
   };
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const parsedParams = await params;
-  const article = await getArticle(parsedParams.slug);
+  const article = await getDevToArticle(parsedParams.slug);
 
   if (!article) {
     notFound();

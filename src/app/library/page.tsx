@@ -4,40 +4,18 @@ import { Movie, Book } from "@/components/library/types";
 import booksData from "@/data/books.json";
 import moviesRawData from "@/data/movies.json";
 import { Metadata } from "next";
+import { getMovieData } from "@/lib/omdb";
 
 export const metadata: Metadata = {
   title: "Media Library | AjayD",
   description: "A collection of books, movies, and series I've enjoyed.",
 };
 
-async function fetchMovieData(imdbID: string) {
-  const rawKey = process.env.OMDB_API_KEY;
-  const OMDB_API_KEY = rawKey ? rawKey.trim() : undefined;
-
-  if (!OMDB_API_KEY) {
-    console.warn("OMDB_API_KEY is not set. Returning placeholder for " + imdbID);
-    return null;
-  }
-  
-  try {
-    const url = `https://www.omdbapi.com/?i=${imdbID}&apikey=${OMDB_API_KEY}`;
-    const res = await fetch(url); 
-    
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (data.Response === "False") return null;
-    return data;
-  } catch (error) {
-    console.error(`Error fetching movie ${imdbID}:`, error);
-    return null;
-  }
-}
-
 export default async function LibraryPage() {
   // Fetch all movie metadata in parallel at build/request time
   const enrichedMovies: Movie[] = await Promise.all(
     moviesRawData.map(async (rawMovie: any) => {
-      const omdbData = await fetchMovieData(rawMovie.imdbID);
+      const omdbData = await getMovieData(rawMovie.imdbID);
       
       if (!omdbData) {
         return {
