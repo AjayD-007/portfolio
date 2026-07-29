@@ -8,7 +8,10 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'mathjs', 'decimal.js'],
+  },
+  turbopack: {},
 };
 
 export default withSerwist(nextConfig);
