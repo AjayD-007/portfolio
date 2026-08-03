@@ -25,7 +25,7 @@ function SceneReady({ setReady }: { setReady: (v: boolean) => void }) {
 // Animated starfield for dynamic reflections
 function AnimatedStars() {
   const groupRef = useRef<THREE.Group>(null);
-  
+
   useFrame((state, delta) => {
     if (groupRef.current) {
       // Extremely slow rotation to simulate distant celestial movement
@@ -36,7 +36,7 @@ function AnimatedStars() {
 
   return (
     <group ref={groupRef}>
-      <Stars 
+      <Stars
         radius={50}       // Inner radius
         depth={50}        // Depth of the starfield
         count={2000}      // Number of stars
@@ -54,7 +54,7 @@ function AnimatedStars() {
 function AnimatedBackground({ isDark }: { isDark: boolean }) {
   const { scene } = useThree();
   const targetColor = useMemo(() => new THREE.Color(isDark ? '#000000' : '#F8F9FA'), [isDark]);
-  
+
   useFrame((state, delta) => {
     if (!scene.background) {
       scene.background = new THREE.Color(isDark ? '#000000' : '#F8F9FA');
@@ -70,7 +70,7 @@ export default function Scene() {
   const isDark = theme === "dark" || resolvedTheme === "dark";
   const pathname = usePathname();
   const isHome = pathname === "/";
-  
+
   const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -90,7 +90,7 @@ export default function Scene() {
         <Suspense fallback={null}>
           <SceneReady setReady={setReady} />
           <AnimatedBackground isDark={isDark} />
-          
+
           {/* Conditional rendering of heavy 3D elements for performance */}
           {isHome && (
             <>
@@ -115,24 +115,22 @@ export default function Scene() {
                 />
               )}
 
-              {/* Environment mapping for reflections */}
-              <Environment 
-                preset={isDark ? "night" : "studio"} 
-                background={false} // Don't render as a literal background, only use for reflection math
+              {/* Environment mapping for Lightformer-based reflections (no preset = no 1.7MB HDRI download) */}
+              <Environment
+                background={false}
               >
-                 {/* Softbox highlights */}
-                 <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
-                 <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, -5, -9]} scale={[10, 10, 1]} />
+                <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
+                <Lightformer intensity={0.5} rotation-x={Math.PI / 2} position={[0, -5, -9]} scale={[10, 10, 1]} />
               </Environment>
             </>
           )}
 
           {/* Render actual background stars globally everywhere (if dark mode) */}
           {isDark && <AnimatedStars />}
-          
+
           {/* True 2D Bloom Post-Processing to create the physical TRON halo effect */}
           {/* Disabled multisampling to massively optimize mobile and laptop GPU bounds */}
-          <EffectComposer  multisampling={0}>
+          <EffectComposer multisampling={0}>
             <Bloom luminanceThreshold={2.0} mipmapBlur intensity={1.5} />
           </EffectComposer>
         </Suspense>
