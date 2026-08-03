@@ -11,7 +11,7 @@ const Bloom = dynamic(() => import('@react-three/postprocessing').then(mod => mo
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 import { useRef, useMemo, useEffect, useState, Suspense } from "react";
-import * as THREE from "three";
+import { Group, Color } from "three";
 import { easing } from "maath";
 import { FloatingObject } from "./FloatingObject";
 
@@ -24,7 +24,7 @@ function SceneReady({ setReady }: { setReady: (v: boolean) => void }) {
 
 // Animated starfield for dynamic reflections
 function AnimatedStars() {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<Group>(null);
 
   useFrame((state, delta) => {
     if (groupRef.current) {
@@ -53,13 +53,13 @@ function AnimatedStars() {
 // Critical for `MeshTransmissionMaterial` to refract white instead of a dark transparent void.
 function AnimatedBackground({ isDark }: { isDark: boolean }) {
   const { scene } = useThree();
-  const targetColor = useMemo(() => new THREE.Color(isDark ? '#000000' : '#F8F9FA'), [isDark]);
+  const targetColor = useMemo(() => new Color(isDark ? '#000000' : '#F8F9FA'), [isDark]);
 
   useFrame((state, delta) => {
     if (!scene.background) {
-      scene.background = new THREE.Color(isDark ? '#000000' : '#F8F9FA');
+      scene.background = new Color(isDark ? '#000000' : '#F8F9FA');
     }
-    easing.dampC(scene.background as THREE.Color, targetColor, 0.5, delta);
+    easing.dampC(scene.background as Color, targetColor, 0.5, delta);
   });
 
   return null;

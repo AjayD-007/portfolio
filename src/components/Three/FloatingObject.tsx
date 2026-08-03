@@ -4,14 +4,14 @@ import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTheme } from "next-themes";
 import { Float } from "@react-three/drei";
-import * as THREE from "three";
+import { Color, Group, Mesh, DoubleSide } from "three";
 import { easing } from "maath";
 
 import { MobiusGeometry } from "./MobiusGeometry";
 
 export function FloatingObject() {
-  const groupRef = useRef<THREE.Group>(null);
-  const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<Group>(null);
+  const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<any>(null);
   const { theme, resolvedTheme } = useTheme();
 
@@ -21,11 +21,11 @@ export function FloatingObject() {
 
   const uniformsRef = useRef({
     uScroll: { value: -0.1 },
-    uColorBase: { value: new THREE.Color(0x000000) },
-    uColorActive: { value: new THREE.Color("#ff0000") }, // Pure Neon Red (0 Green, 0 Blue prevents white clipping)
+    uColorBase: { value: new Color(0x000000) },
+    uColorActive: { value: new Color("#ff0000") }, // Pure Neon Red (0 Green, 0 Blue prevents white clipping)
   });
 
-  const targetColorRef = useRef(new THREE.Color("#ff0000"));
+  const targetColorRef = useRef(new Color("#ff0000"));
 
   // Cache maxScroll to completely eliminate browser Layout Thrashing in the render loop
   const maxScrollRef = useRef(1);
@@ -46,7 +46,7 @@ export function FloatingObject() {
     roughness: 0.5,
     metalness: 0.6,
     envMapIntensity: 0, // Greatly reduced to stop harsh reflections
-    side: THREE.DoubleSide,
+    side: DoubleSide,
     customProgramCacheKey: () => 'mobiusGlow',
     onBeforeCompile: (shader: any) => {
       shader.uniforms.uScroll = uniformsRef.current.uScroll;
@@ -133,7 +133,7 @@ export function FloatingObject() {
       // Smoothly interpolate material color based on theme
       // In Light Mode, use a deep matte grey (#3f3f46) so the object contrasts against the white page
       // and doesn't blow out or become invisible under the scene lights.
-      const targetColor = isDark ? new THREE.Color("#3f3f46") : new THREE.Color("#d4d4d6");
+      const targetColor = isDark ? new Color("#3f3f46") : new Color("#d4d4d6");
       easing.dampC(materialRef.current.color, targetColor, 0.25, delta);
 
       // --- NEW: Sweeping scroll-driven emissive shader ---
@@ -153,7 +153,7 @@ export function FloatingObject() {
       easing.damp(uniformsRef.current.uScroll, 'value', mappedScroll, 0.25, delta);
 
       // Consistent pure red color for both themes to avoid white clipping
-      const activeColor = new THREE.Color("#ff0000");
+      const activeColor = new Color("#ff0000");
       easing.dampC(targetColorRef.current, activeColor, 0.25, delta);
       uniformsRef.current.uColorActive.value.copy(targetColorRef.current);
     }
