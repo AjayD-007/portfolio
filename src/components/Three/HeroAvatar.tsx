@@ -4,8 +4,8 @@ import { useRef, useMemo, useEffect, useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useTheme } from "next-themes";
-import * as THREE from "three";
-
+import { Vector2, LinearFilter, SRGBColorSpace } from "three";
+import type { ShaderMaterial } from "three";
 const fragmentShader = `
 uniform sampler2D uTextureBase;
 uniform sampler2D uTextureColor;
@@ -101,7 +101,7 @@ function HeroAvatarShaderPlane() {
   const { theme, resolvedTheme } = useTheme();
   const isDark = theme === "dark" || resolvedTheme === "dark";
 
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const materialRef = useRef<ShaderMaterial>(null);
 
   const [pencilTex, lightTex, darkTex] = useTexture([
     "/avatar-pencil.png",
@@ -113,9 +113,9 @@ function HeroAvatarShaderPlane() {
     // Crucial fixed config for useTexture that sometimes fails to set automatically in Next.js
     const textures = [pencilTex, lightTex, darkTex];
     textures.forEach(t => {
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.minFilter = THREE.LinearFilter;
-      t.magFilter = THREE.LinearFilter;
+      t.colorSpace = SRGBColorSpace;
+      t.minFilter = LinearFilter;
+      t.magFilter = LinearFilter;
       t.generateMipmaps = false;
       t.needsUpdate = true;
     });
@@ -128,8 +128,8 @@ function HeroAvatarShaderPlane() {
   const uniforms = useMemo(
     () => ({
       uTextureBase: { value: pencilTex },
-      uTextureColor: { value: activeTex }, 
-      uMouse: { value: new THREE.Vector2(-1, -1) },
+      uTextureColor: { value: activeTex },
+      uMouse: { value: new Vector2(-1, -1) },
       uRadius: { value: 0.25 },
       uEdgeWidth: { value: 0.15 },
       uDarkBrightness: { value: isDark ? 0.4 : 1.0 },
@@ -169,7 +169,7 @@ function HeroAvatarShaderPlane() {
   const cardHeight = 4;
 
   return (
-    <mesh 
+    <mesh
       onPointerMove={handlePointerMove}
       onPointerOut={handlePointerOut}
     >
