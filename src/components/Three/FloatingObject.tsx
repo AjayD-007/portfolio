@@ -34,7 +34,7 @@ export function FloatingObject() {
     const updateMaxScroll = () => {
       maxScrollRef.current = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
     };
-    
+
     // Calculate exactly once on mount, then recalculate only if physical viewport dimensions change
     updateMaxScroll();
     window.addEventListener("resize", updateMaxScroll);
@@ -114,48 +114,48 @@ export function FloatingObject() {
 
   useFrame((state, delta) => {
     if (meshRef.current) {
-        // Option 1: Constant Turntable spin on Y-axis
-        meshRef.current.rotation.y += delta * 0.15;
+      // Option 1: Constant Turntable spin on Y-axis
+      meshRef.current.rotation.y += delta * 0.15;
     }
 
     if (materialRef.current) {
-        const isDark = theme === "dark" || resolvedTheme === "dark";
+      const isDark = theme === "dark" || resolvedTheme === "dark";
 
-        // Dynamic material parameters (matte in Light Mode, slightly metallic in Dark Mode)
-        const targetMetalness = isDark ? 0 : 0.0;
-        const targetRoughness = isDark ? 1 : 1.0; 
-        const targetEnvMap = isDark ? 0.0 : 0.0; // Completely cuts all reflections in light mode
-        
-        easing.damp(materialRef.current, 'metalness', targetMetalness, 0.25, delta);
-        easing.damp(materialRef.current, 'roughness', targetRoughness, 0.25, delta);
-        easing.damp(materialRef.current, 'envMapIntensity', targetEnvMap, 0.25, delta);
+      // Dynamic material parameters (matte in Light Mode, slightly metallic in Dark Mode)
+      const targetMetalness = isDark ? 0 : 0.0;
+      const targetRoughness = isDark ? 1 : 1.0;
+      const targetEnvMap = isDark ? 0.0 : 0.0; // Completely cuts all reflections in light mode
 
-        // Smoothly interpolate material color based on theme
-        // In Light Mode, use a deep matte grey (#3f3f46) so the object contrasts against the white page
-        // and doesn't blow out or become invisible under the scene lights.
-        const targetColor = isDark ? new THREE.Color("#3f3f46") : new THREE.Color("#868689");
-        easing.dampC(materialRef.current.color, targetColor, 0.25, delta);
+      easing.damp(materialRef.current, 'metalness', targetMetalness, 0.25, delta);
+      easing.damp(materialRef.current, 'roughness', targetRoughness, 0.25, delta);
+      easing.damp(materialRef.current, 'envMapIntensity', targetEnvMap, 0.25, delta);
 
-        // --- NEW: Sweeping scroll-driven emissive shader ---
-        const scrollY = window.scrollY;
-        
-        // Grab cached un-thrashed document layout value
-        const maxScroll = maxScrollRef.current;
-        
-        // Map scroll to a 0.0 to 1.0 progress curve
-        const progress = Math.max(0, Math.min(1, scrollY / maxScroll));
-        
-        // Map progress from -0.1 to 1.1 to drive the bidirectional expansion
-        // Because max circular distance on the 2.0 domain is 1.0, this completely encircles the strip
-        const mappedScroll = -0.1 + (progress * 1.2);
-        
-        // Smoothly advance the swept uScroll uniform
-        easing.damp(uniformsRef.current.uScroll, 'value', mappedScroll, 0.25, delta);
-        
-        // Consistent pure red color for both themes to avoid white clipping
-        const activeColor = new THREE.Color("#ff0000");
-        easing.dampC(targetColorRef.current, activeColor, 0.25, delta);
-        uniformsRef.current.uColorActive.value.copy(targetColorRef.current);
+      // Smoothly interpolate material color based on theme
+      // In Light Mode, use a deep matte grey (#3f3f46) so the object contrasts against the white page
+      // and doesn't blow out or become invisible under the scene lights.
+      const targetColor = isDark ? new THREE.Color("#3f3f46") : new THREE.Color("#d4d4d6");
+      easing.dampC(materialRef.current.color, targetColor, 0.25, delta);
+
+      // --- NEW: Sweeping scroll-driven emissive shader ---
+      const scrollY = window.scrollY;
+
+      // Grab cached un-thrashed document layout value
+      const maxScroll = maxScrollRef.current;
+
+      // Map scroll to a 0.0 to 1.0 progress curve
+      const progress = Math.max(0, Math.min(1, scrollY / maxScroll));
+
+      // Map progress from -0.1 to 1.1 to drive the bidirectional expansion
+      // Because max circular distance on the 2.0 domain is 1.0, this completely encircles the strip
+      const mappedScroll = -0.1 + (progress * 1.2);
+
+      // Smoothly advance the swept uScroll uniform
+      easing.damp(uniformsRef.current.uScroll, 'value', mappedScroll, 0.25, delta);
+
+      // Consistent pure red color for both themes to avoid white clipping
+      const activeColor = new THREE.Color("#ff0000");
+      easing.dampC(targetColorRef.current, activeColor, 0.25, delta);
+      uniformsRef.current.uColorActive.value.copy(targetColorRef.current);
     }
 
     if (groupRef.current) {
