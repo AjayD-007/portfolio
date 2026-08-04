@@ -1,19 +1,22 @@
 "use client";
 
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useTheme } from "next-themes";
 import { Float } from "@react-three/drei";
 import { Color, Group, Mesh, DoubleSide } from "three";
 import { easing } from "maath";
 
 import { MobiusGeometry } from "./MobiusGeometry";
 
-export function FloatingObject() {
+interface FloatingObjectProps {
+  isDark: boolean;
+  getScrollProgress: () => number;
+}
+
+export function FloatingObject({ isDark, getScrollProgress }: FloatingObjectProps) {
   const groupRef = useRef<Group>(null);
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<any>(null);
-  const { theme, resolvedTheme } = useTheme();
 
   // We no longer track scroll progress to move the object around the screen.
   // The object will act as a stationary, premium "museum artifact" in the center of the layout.
@@ -27,19 +30,8 @@ export function FloatingObject() {
 
   const targetColorRef = useRef(new Color("#ff0000"));
 
-  // Cache maxScroll to completely eliminate browser Layout Thrashing in the render loop
-  const maxScrollRef = useRef(1);
-
-  useEffect(() => {
-    const updateMaxScroll = () => {
-      maxScrollRef.current = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    };
-
-    // Calculate exactly once on mount, then recalculate only if physical viewport dimensions change
-    updateMaxScroll();
-    window.addEventListener("resize", updateMaxScroll);
-    return () => window.removeEventListener("resize", updateMaxScroll);
-  }, []);
+  // scrollProgress is now passed as a prop (0.0 to 1.0) from the main thread,
+  // eliminating all window/document access from this component.
 
   // Setup sweeping emissive custom shader
   const materialProps = useMemo(() => ({
@@ -119,8 +111,6 @@ export function FloatingObject() {
     }
 
     if (materialRef.current) {
-      const isDark = theme === "dark" || resolvedTheme === "dark";
-
       // Dynamic material parameters (matte in Light Mode, slightly metallic in Dark Mode)
       const targetMetalness = isDark ? 0 : 0.0;
       const targetRoughness = isDark ? 1 : 1.0;
@@ -136,14 +126,9 @@ export function FloatingObject() {
       const targetColor = isDark ? new Color("#3f3f46") : new Color("#d4d4d6");
       easing.dampC(materialRef.current.color, targetColor, 0.25, delta);
 
-      // --- NEW: Sweeping scroll-driven emissive shader ---
-      const scrollY = window.scrollY;
-
-      // Grab cached un-thrashed document layout value
-      const maxScroll = maxScrollRef.current;
-
-      // Map scroll to a 0.0 to 1.0 progress curve
-      const progress = Math.max(0, Math.min(1, scrollY / maxScroll));
+      // --- Sweeping scroll-driven emissive shader ---
+      // Get scroll progress dynamically (avoids React re-renders)
+      const progress = getScrollProgress();
 
       // Map progress from -0.1 to 1.1 to drive the bidirectional expansion
       // Because max circular distance on the 2.0 domain is 1.0, this completely encircles the strip
