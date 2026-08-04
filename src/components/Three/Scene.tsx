@@ -10,7 +10,7 @@ const EffectComposer = dynamic(() => import('@react-three/postprocessing').then(
 const Bloom = dynamic(() => import('@react-three/postprocessing').then(mod => mod.Bloom), { ssr: false });
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
-import { useRef, useMemo, useEffect, useState, Suspense } from "react";
+import { useRef, useMemo, useEffect, useState, Suspense, useCallback } from "react";
 import { Group, Color } from "three";
 import { easing } from "maath";
 import { FloatingObject } from "./FloatingObject";
@@ -78,6 +78,13 @@ export default function Scene() {
     setMounted(true);
   }, []);
 
+  // Provide scroll progress directly without React state updates
+  const getScrollProgress = () => {
+    if (typeof window === 'undefined') return 0;
+    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    return Math.max(0, Math.min(1, window.scrollY / maxScroll));
+  };
+
   if (!mounted) return null;
 
   return (
@@ -99,7 +106,7 @@ export default function Scene() {
               <spotLight position={[10, 10, 10]} penumbra={1} angle={0.2} intensity={isDark ? 1 : 0.5} />
 
               {/* Floating Object */}
-              <FloatingObject />
+              <FloatingObject isDark={isDark} getScrollProgress={getScrollProgress} />
 
               {/* Grounding Contact Shadows for Light Mode */}
               {!isDark && (
