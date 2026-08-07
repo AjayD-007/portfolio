@@ -18,7 +18,8 @@ export const Card = ({ children, className = "", delay = 0, variant = "default",
 
   return (
     <div className={`${baseClasses} ${variantClasses[variant]} ${className}`} {...props}>
-      {/* Subtle inner glow */}
+      {/* Professional radial gradient / subtle mesh glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[var(--text-main)]/5 via-transparent to-transparent pointer-events-none rounded-2xl mix-blend-overlay" />
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--glow-inner)] to-transparent pointer-events-none rounded-2xl" />
       {/* Content wrapper */}
       <div className={`relative z-10 flex h-full w-full ${variant=="nav"?"":"flex-col"}`}>

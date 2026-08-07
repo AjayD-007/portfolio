@@ -65,7 +65,7 @@ export function MediaCard({
       rel="noopener noreferrer"
       className="group h-full block"
     >
-      <Card variant="interactive" className="h-full flex flex-col justify-between hover:scale-[1.02] hover:-translate-y-1">
+      <Card variant="interactive" className="h-full flex flex-col justify-between">
         
         {item.coverImageUrl ? (
           <div className="w-full aspect-video rounded-xl overflow-hidden mb-6 relative bg-black flex items-center justify-center border border-[var(--border-subtle)]">

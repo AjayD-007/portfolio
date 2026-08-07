@@ -67,11 +67,11 @@ export function Header() {
               </div>
             ) : (
                <div
-                className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium text-black/20 dark:text-white/20 bg-black/5 dark:bg-white/10 backdrop-blur-md px-2.5 md:px-4 py-1.5 md:py-3 rounded-full border border-black/10 dark:border-white/20 animate-pulse"
+                className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium bg-black/5 dark:bg-white/10 backdrop-blur-md px-2.5 md:px-4 py-1.5 md:py-3 rounded-full border border-black/10 dark:border-white/20 animate-pulse"
                 aria-hidden="true"
               >
-                <Eye className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="opacity-0">0,000</span>
+                <Eye className="w-4 h-4 md:w-5 md:h-5 text-black/20 dark:text-white/20" />
+                <div className="w-8 h-4 rounded bg-black/10 dark:bg-white/20"></div>
               </div>
             )}
             <ThemeToggle />

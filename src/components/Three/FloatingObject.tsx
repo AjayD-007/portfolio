@@ -35,8 +35,8 @@ export function FloatingObject({ isDark, getScrollProgress }: FloatingObjectProp
 
   // Setup sweeping emissive custom shader
   const materialProps = useMemo(() => ({
-    roughness: 0.5,
-    metalness: 0.6,
+    roughness: 0.4,
+    metalness: isDark ? 0.5 : 0.7,
     envMapIntensity: 0, // Greatly reduced to stop harsh reflections
     side: DoubleSide,
     customProgramCacheKey: () => 'mobiusGlow',
@@ -111,19 +111,21 @@ export function FloatingObject({ isDark, getScrollProgress }: FloatingObjectProp
     }
 
     if (materialRef.current) {
-      // Dynamic material parameters (matte in Light Mode, slightly metallic in Dark Mode)
-      const targetMetalness = isDark ? 0 : 0.0;
-      const targetRoughness = isDark ? 1 : 1.0;
-      const targetEnvMap = isDark ? 0.0 : 0.0; // Completely cuts all reflections in light mode
+      // Dynamic material parameters
+      // Dark Mode: Metallic, shiny (adjusted for 0 envMap so it's not pitch black)
+      // Light Mode: Ceramic (non-metallic, glossy, eggshell color)
+      const targetMetalness = isDark ? 0.3 : 0.05;
+      const targetRoughness = isDark ? 0.7 : 0.25;
+      const targetEnvMap = 0.0; // Restored to 0 for performance!
 
       easing.damp(materialRef.current, 'metalness', targetMetalness, 0.25, delta);
       easing.damp(materialRef.current, 'roughness', targetRoughness, 0.25, delta);
       easing.damp(materialRef.current, 'envMapIntensity', targetEnvMap, 0.25, delta);
 
       // Smoothly interpolate material color based on theme
-      // In Light Mode, use a deep matte grey (#3f3f46) so the object contrasts against the white page
-      // and doesn't blow out or become invisible under the scene lights.
-      const targetColor = isDark ? new Color("#3f3f46") : new Color("#d4d4d6");
+      // Dark Mode: Lighter gray than before, because without envMap, high metalness turns black
+      // Light Mode: Eggshell white for the ceramic look
+      const targetColor = isDark ? new Color("#44444a") : new Color("#f8f8f7");
       easing.dampC(materialRef.current.color, targetColor, 0.25, delta);
 
       // --- Sweeping scroll-driven emissive shader ---

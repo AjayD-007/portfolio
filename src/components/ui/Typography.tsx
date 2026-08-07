@@ -13,7 +13,7 @@ export const Heading = ({ level = 2, variant = "card", className = "", children,
     "section": "text-4xl md:text-6xl font-black drop-shadow-sm mb-4 md:mb-8 text-center md:text-left w-full",
     "section-card": "text-4xl md:text-6xl font-black drop-shadow-sm mb-4 md:mb-8 text-center w-full",
     "card": "text-2xl md:text-3xl font-bold mb-3 md:mb-4",
-    "card-interactive": "text-2xl md:text-3xl font-bold mb-3 md:mb-4 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors",
+    "card-interactive": "text-2xl md:text-3xl font-bold mb-3 md:mb-4",
     "card-subtitle": "text-xl md:text-2xl font-bold",
   };
 
@@ -42,7 +42,7 @@ export const Text = ({ variant = "body", className = "", children, ...props }: T
     "body": "text-lg md:text-2xl font-medium leading-relaxed",
     "muted": "text-base md:text-lg text-[var(--text-muted)] font-medium leading-relaxed",
     "card-subtitle": "text-base md:text-lg text-[var(--text-muted)] font-medium leading-relaxed mt-1 md:mt-2",
-    "hero-subtitle": "text-lg md:text-xl lg:text-2xl text-[var(--text-muted)] font-semibold mb-6 capitalize text-center md:text-left w-full",
+    "hero-subtitle": "text-lg md:text-xl lg:text-2xl text-[var(--text-muted)] font-semibold capitalize text-center md:text-left w-full",
     "label": "text-[10px] sm:text-xs md:text-sm font-mono font-bold tracking-widest uppercase",
   };
 
